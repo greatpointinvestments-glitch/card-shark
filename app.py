@@ -11,7 +11,7 @@ from auth import render_auth_ui
 from tiers import is_pro
 
 # Page modules
-from pages import (
+from views import (
     home, card_scanner, live_games, player_search, price_history,
     breakout_leaderboard, legend_cards, trade_checker, flip_finder_page,
     player_comparison, market_movers, price_alerts_page, my_collection,
