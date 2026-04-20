@@ -1,54 +1,92 @@
 # Card Shark 🦈
 
-Sports card investment analyzer built with Streamlit. Search players, find deals, scout breakout rookies, evaluate legend cards, and check trades — all powered by live eBay market data.
+**Sports & Pokemon card investment analyzer.** Scan cards with AI, find underpriced deals, track your portfolio, and make smarter trades — powered by live eBay and TCGPlayer market data.
 
-## Features
+## What It Does
 
-- **Player Search** — Look up any NBA/NFL/MLB player, see career stats, and browse eBay card listings with deal detection
-- **Breakout Leaderboard** — Ranked young NBA players with the highest breakout potential, scored on trajectory, age, draft position, and market data
-- **Legend Cards** — Retired player investment guide with hidden gem detection for undervalued HOF cards
-- **Trade Checker** — Evaluate multi-card trades with eBay market valuations and letter grades
+### Discover
+- **Player Search** — Look up any NBA/NFL/MLB player or Pokemon, see stats and card listings with deal detection
+- **What Can I Get?** — Budget-first card finder (set $25, find the best cards you can afford)
+- **Breakout Leaderboard** — Young players ranked by breakout potential (trajectory, age, draft position, market data)
+- **Legend Cards** — Retired player + iconic Pokemon investment guide with hidden gem detection
+- **Live Games** — Real-time NBA/NFL/MLB scores with card impact alerts
 
-## Demo Mode
+### Tools
+- **Card Scanner** — AI-powered card identification (Claude Vision). Snap a photo → instant ID, value, and condition estimate
+- **Trade Checker** — Scan or enter cards on both sides, get a letter grade (A-F) with breakout upside bonuses
+- **Player Comparison** — Side-by-side stats, market data, and investment verdict
+- **Grading Calculator** — "Should I send this to PSA?" Expected value analysis with grade probability
 
-Card Shark works out of the box with realistic demo data — no API keys required. Add your own keys for live eBay listings.
+### Market
+- **Flip Finder** — BIN listings priced below recent sold prices with confidence scoring and seller verification
+- **Market Movers** — Biggest price swings in the last 24-72 hours
+- **Price History** — Interactive charts tracking any card's price over time
+- **Price Alerts** — Set target prices, get notified when cards hit your buy/sell point
 
-## Setup
+### My Stuff
+- **My Collection** — Track what you paid, what it's worth now, P&L, diversification score, projected value
+- **CSV Import** — Bulk import from Ludex, CollX, TCDB, Cardbase, or any CSV format
 
-1. Clone and install:
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Revenue Model
 
-2. (Optional) Add API keys in a `.env` file:
-   ```
-   EBAY_CLIENT_ID=your_client_id
-   EBAY_CLIENT_SECRET=your_client_secret
-   BALLDONTLIE_API_KEY=your_key
-   ```
-
-3. Run:
-   ```bash
-   streamlit run app.py
-   ```
-
-## Streamlit Cloud
-
-To deploy on Streamlit Community Cloud:
-
-1. Push to GitHub
-2. Connect the repo at [share.streamlit.io](https://share.streamlit.io)
-3. Add your API keys in the app's Secrets settings (same format as `.env`)
-
-The app automatically checks `st.secrets` first, then falls back to environment variables.
+- **Freemium SaaS:** Free tier (10 searches/day, 25 cards) → Pro ($7.99/mo or $59.99/yr or $149 lifetime)
+- **Affiliate commissions:** eBay Partner Network, TCGPlayer (Pokemon), PWCC, COMC, Fanatics Collect, Alt, Goldin
+- **Pro features gated:** Flip Finder, Market Movers, Grading Calculator, Player Comparison, Price Alerts, Price History (90d+), CSV Export
 
 ## Tech Stack
 
-- **Streamlit** — UI framework
-- **eBay Browse + Finding APIs** — Active and sold card listings
-- **nba_api** — NBA player stats
-- **ESPN + MLB Stats APIs** — NFL and MLB stats (free, no key needed)
+- **Frontend:** Streamlit (Python)
+- **APIs:** eBay Browse + Finding APIs, Pokemon TCG API, nba_api, ESPN, MLB Stats API
+- **AI:** Anthropic Claude Vision (card scanning)
+- **Payments:** Stripe (subscriptions + one-time lifetime deal)
+- **Auth:** Custom auth with bcrypt, per-user data isolation
+- **Affiliates:** 7 marketplace integrations with unified link handler
 
-## Built By
+## Architecture
 
-Sam & Son | Powered by Claude Code
+```
+card-shark/              ← Streamlit web app (this repo)
+card-shark-api/          ← FastAPI backend for mobile app (separate repo)
+```
+
+The FastAPI backend mirrors all business logic for the future React Native mobile app (iOS + Android). Both share the same eBay/TCGPlayer/stats APIs.
+
+## Supported Categories
+
+| Category | Data Source | Pricing |
+|----------|-----------|---------|
+| NBA | eBay + nba_api | eBay market data |
+| NFL | eBay + ESPN | eBay market data |
+| MLB | eBay + MLB Stats API | eBay market data |
+| Pokemon | Pokemon TCG API + eBay | TCGPlayer prices (primary) + eBay graded (secondary) |
+
+## Key Metrics Targets
+
+| Metric | Month 1 | Month 6 |
+|--------|---------|---------|
+| Signups | 500 | 10,000 |
+| Pro conversion | 8% | 15% |
+| MRR | $300 | $6,000 |
+| Lifetime deals | 15 | 100 (capped) |
+
+## Status
+
+- **Web app:** Live (v6.1 + Pokemon support)
+- **API backend:** Built (67 files, 14 routes, PostgreSQL + Redis)
+- **Mobile app:** Pending (React Native, post-DUNS approval)
+- **Stripe:** Test mode configured
+- **eBay Partner Network:** Application submitted
+- **Domain:** cardsharkapp.com registered
+- **Email:** hello@cardsharkapp.com (Zoho)
+
+## Local Development
+
+```bash
+pip install -r requirements.txt
+# Add API keys to .env (see .env.example)
+streamlit run app.py
+```
+
+---
+
+Built by Sam Heide | Powered by Claude Code

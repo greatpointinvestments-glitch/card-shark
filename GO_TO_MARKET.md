@@ -8,16 +8,23 @@
 
 ## 1. Pre-Launch Checklist (Do Before Promoting)
 
-- [ ] Deploy to Streamlit Community Cloud (or Railway for more control)
-- [ ] Register domain: `cardsharkapp.com` → point at deploy URL
-- [ ] Sign up for eBay Partner Network → paste `EPN_CAMPAIGN_ID` into secrets
-- [ ] Create Stripe Prices — monthly, yearly, lifetime, plus 20%-off monthly and 20%-off yearly for the abandoned-checkout coupon
-- [ ] Set up hello@cardsharkapp.com forwarding to Sam's inbox
+- [x] Deploy to Streamlit Community Cloud
+- [x] Register domain: `cardsharkapp.com`
+- [x] Sign up for eBay Partner Network (application submitted Apr 20, awaiting Campaign ID)
+- [x] Create Stripe Prices — monthly ($7.99), yearly ($59.99), lifetime ($149), plus 20%-off variants ($6.39/mo, $47.99/yr). Test mode configured.
+- [x] Set up hello@cardsharkapp.com (Zoho Mail, active Apr 14)
+- [x] GitHub repos: card-shark (Streamlit) + card-shark-api (FastAPI)
+- [x] Pokemon card support added (Pokemon TCG API + TCGPlayer affiliate links)
 - [ ] Add Plausible or PostHog for analytics (free tier fine to start)
 - [ ] Write landing-page meta tags + OG image for link previews
 - [ ] Create X (Twitter), TikTok, Instagram handles: @cardsharkapp
 - [ ] Open a Discord server — two public channels (#general, #flips-of-the-day), one Pro-only channel (#flip-alerts)
 - [ ] Record 10 short demo clips in one sitting (see TikTok calendar below)
+- [ ] Switch Stripe to live mode + set up webhook endpoint
+- [ ] Add EPN Campaign ID to secrets (when approved)
+- [ ] DUNS number (in progress — additional docs submitted to D&B Apr 14)
+- [ ] Apple Developer Program enrollment (after DUNS clears)
+- [ ] Hire React Native developer for mobile app (post on Upwork, $8-12K)
 
 ---
 
