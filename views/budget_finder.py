@@ -13,13 +13,16 @@ def render(demo_mode: bool = False):
     st.caption("Enter your budget and pick a player — we'll find the best cards you can afford")
     render_disclaimer(compact=True)
 
+    # Track quick-pick budget separately to avoid widget key conflict
+    _default_budget = st.session_state.get("_bf_quick_budget", 25.0)
+
     col1, col2, col3 = st.columns(3)
     with col1:
         player_name = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama", key="bf_player")
     with col2:
         sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="bf_sport")
     with col3:
-        budget = st.number_input("My Budget ($)", min_value=1.0, value=25.0, step=5.0, key="bf_budget")
+        budget = st.number_input("My Budget ($)", min_value=1.0, value=_default_budget, step=5.0, key="bf_budget")
 
     # Quick budget buttons
     qb_cols = st.columns(4)
@@ -27,7 +30,7 @@ def render(demo_mode: bool = False):
     for i, amt in enumerate(quick_amounts):
         with qb_cols[i]:
             if st.button(f"${amt}", key=f"qb_{amt}", use_container_width=True):
-                st.session_state.bf_budget = float(amt)
+                st.session_state._bf_quick_budget = float(amt)
                 st.rerun()
 
     if not player_name:
