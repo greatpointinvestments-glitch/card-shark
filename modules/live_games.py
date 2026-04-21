@@ -259,8 +259,8 @@ def build_watch_links(game: dict) -> dict:
     away = game.get("away_team", "")
     yt_query = f"{away}+vs+{home}+highlights+{today}".replace(" ", "+")
 
-    # DraftKings search by team names
-    dk_query = f"{away} vs {home}".replace(" ", "+")
+    # DraftKings — link to the sport's main page (search URLs don't work)
+    dk_sport_path = {"NBA": "basketball/nba", "NFL": "football/nfl", "MLB": "baseball/mlb"}.get(sport, "basketball/nba")
 
     # ESPN gamecast link — NBA/NFL use ESPN game IDs directly.
     # MLB uses gamePk from the MLB Stats API which doesn't match ESPN IDs,
@@ -274,7 +274,7 @@ def build_watch_links(game: dict) -> dict:
     return {
         "gamecast": gamecast,
         "youtube_highlights": f"https://www.youtube.com/results?search_query={yt_query}",
-        "draftkings": f"https://sportsbook.draftkings.com/search/{dk_query}",
+        "draftkings": f"https://sportsbook.draftkings.com/sports/{dk_sport_path}",
     }
 
 
