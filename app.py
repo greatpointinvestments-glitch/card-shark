@@ -67,18 +67,18 @@ st.markdown("""
     }
     .ebay-btn {
         display: inline-block; padding: 4px 14px; border-radius: 6px;
-        background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff;
-        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        background: linear-gradient(135deg, #3b82f6, #2563eb); color: #fff !important;
+        font-weight: bold; font-size: 0.85em; text-decoration: none !important;
         transition: transform 0.15s, box-shadow 0.15s;
     }
-    .ebay-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(59,130,246,0.5); color: #fff; }
+    .ebay-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(59,130,246,0.5); color: #fff !important; }
     .tcgplayer-btn {
         display: inline-block; padding: 4px 14px; border-radius: 6px;
-        background: linear-gradient(135deg, #ed64a6, #d53f8c); color: #fff;
-        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        background: linear-gradient(135deg, #ed64a6, #d53f8c); color: #fff !important;
+        font-weight: bold; font-size: 0.85em; text-decoration: none !important;
         transition: transform 0.15s, box-shadow 0.15s;
     }
-    .tcgplayer-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(237,100,166,0.5); color: #fff; }
+    .tcgplayer-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(237,100,166,0.5); color: #fff !important; }
     .whatnot-btn {
         display: inline-block; padding: 4px 14px; border-radius: 6px;
         background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff !important;
