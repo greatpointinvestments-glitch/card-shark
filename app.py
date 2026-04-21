@@ -76,6 +76,41 @@ st.markdown("""
         transition: transform 0.15s, box-shadow 0.15s;
     }
     .tcgplayer-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(237,100,166,0.5); color: #fff; }
+    .whatnot-btn {
+        display: inline-block; padding: 4px 14px; border-radius: 6px;
+        background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff;
+        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .whatnot-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(124,58,237,0.5); color: #fff; }
+    .topps-btn {
+        display: inline-block; padding: 4px 14px; border-radius: 6px;
+        background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;
+        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .topps-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(239,68,68,0.5); color: #fff; }
+    .beckett-btn {
+        display: inline-block; padding: 4px 14px; border-radius: 6px;
+        background: linear-gradient(135deg, #14b8a6, #0d9488); color: #fff;
+        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .beckett-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(20,184,166,0.5); color: #fff; }
+    .drip-shop-btn {
+        display: inline-block; padding: 4px 14px; border-radius: 6px;
+        background: linear-gradient(135deg, #f59e0b, #d97706); color: #1f2937;
+        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .drip-shop-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(245,158,11,0.5); color: #1f2937; }
+    .supplies-btn {
+        display: inline-block; padding: 4px 14px; border-radius: 6px;
+        background: linear-gradient(135deg, #22c55e, #16a34a); color: #fff;
+        font-weight: bold; font-size: 0.85em; text-decoration: none;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .supplies-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(34,197,94,0.5); color: #fff; }
     .grade-badge {
         display: inline-block; padding: 16px 28px; border-radius: 12px;
         font-weight: 900; font-size: 3em; letter-spacing: 2px;

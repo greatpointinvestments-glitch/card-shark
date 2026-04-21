@@ -3,7 +3,8 @@
 import streamlit as st
 import plotly.graph_objects as go
 
-from modules.ui_helpers import gradient_divider, score_progress_bar
+from modules.ui_helpers import gradient_divider, score_progress_bar, supplies_button
+from modules.affiliates import supplies_affiliate_url, SUPPLIES_LINKS
 from modules.portfolio import add_card, remove_card, get_portfolio, bulk_import_cards
 from modules.collection_analytics import compute_collection_analytics, compute_portfolio_timeline, export_portfolio_csv
 from modules.trade_analyzer import get_card_market_value
@@ -424,5 +425,17 @@ def render(current_user: str | None):
     st.markdown(score_progress_bar(div_score["total_score"]), unsafe_allow_html=True)
     for suggestion in div_score["suggestions"]:
         st.caption(f"- {suggestion}")
+
+    # --- Protect Your Collection (supplies affiliates) ---
+    gradient_divider()
+    st.markdown("### Protect Your Collection")
+    sup1, sup2, sup3 = st.columns(3)
+    for col, key in zip([sup1, sup2, sup3], ["bcw", "zion", "cardshellz"]):
+        info = SUPPLIES_LINKS[key]
+        url = supplies_affiliate_url(key)
+        with col:
+            st.markdown(f"**{info['name']}**")
+            st.caption(info["description"])
+            st.markdown(supplies_button(url, "Shop"), unsafe_allow_html=True)
 
 

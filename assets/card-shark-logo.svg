@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#0f172a"/>
+    </linearGradient>
+    <linearGradient id="shark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#64748b"/>
+      <stop offset="100%" style="stop-color:#475569"/>
+    </linearGradient>
+    <linearGradient id="belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2e8f0"/>
+      <stop offset="100%" style="stop-color:#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="190" fill="url(#bg)"/>
+  <circle cx="200" cy="200" r="185" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.3"/>
+
+  <!-- Shark body -->
+  <path d="M 80 210 Q 100 160 160 150 Q 200 142 240 155 Q 280 168 310 200 Q 330 220 320 240 Q 310 260 280 265 Q 240 270 200 262 Q 160 255 120 245 Q 90 238 80 210 Z" fill="url(#shark)"/>
+
+  <!-- Shark belly -->
+  <path d="M 120 230 Q 140 215 180 210 Q 220 205 260 215 Q 290 225 300 240 Q 280 255 240 258 Q 200 260 160 250 Q 130 242 120 230 Z" fill="url(#belly)"/>
+
+  <!-- Dorsal fin -->
+  <path d="M 195 152 L 210 95 Q 215 90 220 100 L 230 155" fill="url(#shark)" stroke="#475569" stroke-width="1"/>
+
+  <!-- Tail fin -->
+  <path d="M 80 210 L 45 175 Q 40 170 50 180 L 65 195 M 80 210 L 50 240 Q 45 248 55 238 L 70 225" fill="url(#shark)" stroke="#475569" stroke-width="1"/>
+
+  <!-- Pectoral fin -->
+  <path d="M 180 245 L 165 285 Q 162 292 170 288 L 200 260" fill="url(#shark)" stroke="#475569" stroke-width="1"/>
+
+  <!-- Eye -->
+  <circle cx="275" cy="195" r="12" fill="#0f172a"/>
+  <circle cx="278" cy="192" r="5" fill="#fff"/>
+  <circle cx="275" cy="195" r="2" fill="#0f172a"/>
+
+  <!-- Mouth line -->
+  <path d="M 300 225 Q 315 230 330 225" fill="none" stroke="#334155" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Teeth (upper) -->
+  <path d="M 302 222 L 305 228 L 308 222" fill="#fff" stroke="#e2e8f0" stroke-width="0.5"/>
+  <path d="M 310 221 L 313 227 L 316 221" fill="#fff" stroke="#e2e8f0" stroke-width="0.5"/>
+  <path d="M 318 222 L 321 228 L 324 222" fill="#fff" stroke="#e2e8f0" stroke-width="0.5"/>
+
+  <!-- Card in mouth - angled, sticking out -->
+  <g transform="translate(330, 210) rotate(-25)">
+    <!-- Card shadow -->
+    <rect x="3" y="3" width="42" height="58" rx="3" fill="rgba(0,0,0,0.3)"/>
+    <!-- Card base -->
+    <rect x="0" y="0" width="42" height="58" rx="3" fill="url(#card)" stroke="#b45309" stroke-width="1.5"/>
+    <!-- Card inner border -->
+    <rect x="4" y="4" width="34" height="50" rx="2" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+    <!-- Card star/diamond -->
+    <path d="M 21 18 L 26 27 L 21 36 L 16 27 Z" fill="#fff" opacity="0.8"/>
+    <!-- Card lines -->
+    <line x1="12" y1="42" x2="30" y2="42" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+    <line x1="14" y1="46" x2="28" y2="46" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+  </g>
+
+  <!-- Gill lines -->
+  <path d="M 255 210 Q 253 220 255 230" fill="none" stroke="#334155" stroke-width="1.5" opacity="0.6"/>
+  <path d="M 250 212 Q 248 222 250 232" fill="none" stroke="#334155" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Subtle water bubbles -->
+  <circle cx="100" cy="180" r="4" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.3"/>
+  <circle cx="90" cy="165" r="3" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.2"/>
+  <circle cx="110" cy="170" r="2" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.25"/>
+</svg>

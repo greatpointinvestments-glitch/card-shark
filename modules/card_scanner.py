@@ -190,6 +190,24 @@ def build_collection_entry_from_scan(
         "set_name": scan_result.get("set_name"),
         "card_number": scan_result.get("card_number"),
         "variant": variant,
-        "scan_source": "claude_vision",
+        "scan_source": scan_result.get("scan_method", "claude_vision"),
         "scan_confidence": scan_result.get("confidence", "low"),
     }
+
+
+def smart_scan(image_bytes: bytes, file_name: str = "card.jpg") -> dict:
+    """Dispatcher: Pro users get Claude Vision, free users get OCR.
+
+    Returns the same dict shape as scan_card_image() plus a 'scan_method' key.
+    """
+    from tiers import is_pro
+
+    if is_pro() and _anthropic_is_configured():
+        result = scan_card_image(image_bytes, file_name)
+        result["scan_method"] = "claude_vision"
+    else:
+        from modules.ocr_scanner import ocr_scan_card_image
+        result = ocr_scan_card_image(image_bytes, file_name)
+        result["scan_method"] = "ocr"
+
+    return result

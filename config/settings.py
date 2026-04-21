@@ -114,6 +114,10 @@ PSA_CACHE_TTL = 3600  # 1-hour cache for PSA population data
 SCANNER_MODEL = "claude-haiku-4-5-20251001"
 SCANNER_MAX_TOKENS = 1024
 
+# --- OCR Scanner (free tier) ---
+OCR_CONFIDENCE_THRESHOLD = 2   # min fields extracted for "medium" confidence
+OCR_MIN_TEXT_LENGTH = 10       # min chars from Tesseract to attempt parsing
+
 # --- Subscription Tiers ---
 FREE_TIER_LIMITS = {
     "searches_per_day": 10,
@@ -184,6 +188,15 @@ POKEMON_TCG_BASE_URL = "https://api.pokemontcg.io/v2"
 
 # --- TCGPlayer Affiliate ---
 TCGPLAYER_AFFILIATE_ID = _get_secret("TCGPLAYER_AFFILIATE_ID")
+
+# --- New Affiliate Partners ---
+WHATNOT_AFFILIATE_ID = _get_secret("WHATNOT_AFFILIATE_ID")
+TOPPS_AFFILIATE_ID = _get_secret("TOPPS_AFFILIATE_ID")
+BECKETT_AFFILIATE_ID = _get_secret("BECKETT_AFFILIATE_ID")
+BCW_AFFILIATE_ID = _get_secret("BCW_AFFILIATE_ID")
+ZION_AFFILIATE_ID = _get_secret("ZION_AFFILIATE_ID")
+CARDSHELLZ_AFFILIATE_ID = _get_secret("CARDSHELLZ_AFFILIATE_ID")
+DRIP_SHOP_AFFILIATE_ID = _get_secret("DRIP_SHOP_AFFILIATE_ID")
 
 # --- Price Alerts ---
 ALERTS_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "alerts.json")

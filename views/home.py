@@ -19,6 +19,9 @@ from tiers import is_pro
 
 
 def render(current_user: str | None):
+    # Impact.com site verification (hidden from users)
+    st.markdown('<div style="display:none;">Impact-Site-Verification: 7f5de73e-561a-4412-be25-6945fd4abeef</div>', unsafe_allow_html=True)
+
     # --- Landing Hero (for visitors) ---
     if not current_user:
         st.markdown("""

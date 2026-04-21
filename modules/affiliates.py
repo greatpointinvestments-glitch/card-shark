@@ -1,19 +1,24 @@
 """Unified affiliate link handling across card marketplaces.
 
-Supports: eBay (EPN), PWCC, COMC, Fanatics Collect, Alt, Goldin.
+Supports: eBay (EPN), PWCC, COMC, Fanatics Collect, Alt, Goldin,
+          TCGPlayer, Whatnot, Topps, Beckett, BCW, Zion Cases,
+          Cardshellz, Drip Shop Live.
 
 Usage:
     from modules.affiliates import affiliate_url, detect_marketplace
     url = affiliate_url("https://www.ebay.com/itm/12345")
 """
 
-from urllib.parse import urlparse, urlencode, parse_qs, urlunparse
+from urllib.parse import urlparse, urlencode, parse_qs, urlunparse, quote_plus
 
 from config.settings import (
     EPN_CAMPAIGN_ID, EPN_TRACKING_ID,
     PWCC_AFFILIATE_ID, COMC_AFFILIATE_ID,
     FANATICS_COLLECT_AFFILIATE_ID, ALT_AFFILIATE_ID, GOLDIN_AFFILIATE_ID,
     TCGPLAYER_AFFILIATE_ID,
+    WHATNOT_AFFILIATE_ID, TOPPS_AFFILIATE_ID, BECKETT_AFFILIATE_ID,
+    BCW_AFFILIATE_ID, ZION_AFFILIATE_ID, CARDSHELLZ_AFFILIATE_ID,
+    DRIP_SHOP_AFFILIATE_ID,
 )
 
 
@@ -26,6 +31,13 @@ MARKETPLACE_NAMES = {
     "alt": "Alt",
     "goldin": "Goldin",
     "tcgplayer": "TCGPlayer",
+    "whatnot": "Whatnot",
+    "topps": "Topps",
+    "beckett": "Beckett",
+    "bcw": "BCW Supplies",
+    "zion": "Zion Cases",
+    "cardshellz": "Cardshellz",
+    "drip_shop": "Drip Shop Live",
     "unknown": "Marketplace",
 }
 
@@ -49,6 +61,20 @@ def detect_marketplace(url: str) -> str:
         return "goldin"
     if "tcgplayer.com" in host:
         return "tcgplayer"
+    if "whatnot.com" in host:
+        return "whatnot"
+    if "topps.com" in host:
+        return "topps"
+    if "beckett.com" in host:
+        return "beckett"
+    if "bcwsupplies.com" in host:
+        return "bcw"
+    if "zioncases.com" in host:
+        return "zion"
+    if "cardshellz.com" in host:
+        return "cardshellz"
+    if "dripshoplive.com" in host:
+        return "drip_shop"
     return "unknown"
 
 
@@ -110,6 +136,48 @@ def _tcgplayer_url(url: str) -> str:
     return _append_params(url, {"partner": TCGPLAYER_AFFILIATE_ID, "utm_source": "cardshark", "utm_medium": "affiliate"})
 
 
+def _whatnot_url(url: str) -> str:
+    if not WHATNOT_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"ref": WHATNOT_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _topps_url(url: str) -> str:
+    if not TOPPS_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"aff": TOPPS_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _beckett_url(url: str) -> str:
+    if not BECKETT_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"aid": BECKETT_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _bcw_url(url: str) -> str:
+    if not BCW_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"ref": BCW_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _zion_url(url: str) -> str:
+    if not ZION_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"ref": ZION_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _cardshellz_url(url: str) -> str:
+    if not CARDSHELLZ_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"ref": CARDSHELLZ_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
+def _drip_shop_url(url: str) -> str:
+    if not DRIP_SHOP_AFFILIATE_ID:
+        return url
+    return _append_params(url, {"ref": DRIP_SHOP_AFFILIATE_ID, "utm_source": "cardshark"})
+
+
 _ROUTER = {
     "ebay": _ebay_url,
     "pwcc": _pwcc_url,
@@ -118,6 +186,13 @@ _ROUTER = {
     "alt": _alt_url,
     "goldin": _goldin_url,
     "tcgplayer": _tcgplayer_url,
+    "whatnot": _whatnot_url,
+    "topps": _topps_url,
+    "beckett": _beckett_url,
+    "bcw": _bcw_url,
+    "zion": _zion_url,
+    "cardshellz": _cardshellz_url,
+    "drip_shop": _drip_shop_url,
 }
 
 
@@ -160,10 +235,79 @@ def ebay_search_affiliate_url(player_name: str, sport: str = "", card_type: str 
 
 def tcgplayer_search_affiliate_url(card_name: str, set_name: str = "") -> str:
     """Generate a TCGPlayer search URL for a Pokemon card, wrapped with affiliate params."""
-    from urllib.parse import quote_plus
     query_parts = [card_name]
     if set_name:
         query_parts.append(set_name)
     query = quote_plus(" ".join(query_parts))
     base = f"https://www.tcgplayer.com/search/pokemon/product?q={query}&view=grid"
     return affiliate_url(base)
+
+
+def whatnot_search_affiliate_url(player_name: str, sport: str = "") -> str:
+    """Generate a Whatnot search URL for live breaks / marketplace listings."""
+    query_parts = [player_name]
+    if sport and sport != "Pokemon":
+        query_parts.append(sport)
+    query_parts.append("card")
+    query = quote_plus(" ".join(query_parts))
+    base = f"https://www.whatnot.com/search?q={query}"
+    return affiliate_url(base)
+
+
+def topps_search_affiliate_url(player_name: str, sport: str = "") -> str:
+    """Generate a Topps store search URL (sports cards only)."""
+    query_parts = [player_name]
+    if sport:
+        query_parts.append(sport)
+    query = quote_plus(" ".join(query_parts))
+    base = f"https://www.topps.com/search?q={query}"
+    return affiliate_url(base)
+
+
+def beckett_search_affiliate_url(player_name: str, sport: str = "") -> str:
+    """Generate a Beckett price guide search URL."""
+    query_parts = [player_name]
+    if sport:
+        query_parts.append(sport)
+    query = quote_plus(" ".join(query_parts))
+    base = f"https://www.beckett.com/search?term={query}"
+    return affiliate_url(base)
+
+
+def drip_shop_search_affiliate_url(player_name: str, sport: str = "") -> str:
+    """Generate a Drip Shop Live search URL for live card breaks."""
+    query_parts = [player_name]
+    if sport:
+        query_parts.append(sport)
+    query = quote_plus(" ".join(query_parts))
+    base = f"https://www.dripshoplive.com/search?q={query}"
+    return affiliate_url(base)
+
+
+# --- Supplies Links (static category pages) ---
+
+SUPPLIES_LINKS = {
+    "bcw": {
+        "name": "BCW Supplies",
+        "description": "Sleeves, top loaders, and storage boxes",
+        "url": "https://www.bcwsupplies.com/trading-card",
+    },
+    "zion": {
+        "name": "Zion Cases",
+        "description": "Premium display cases and slabs",
+        "url": "https://www.zioncases.com/collections/all",
+    },
+    "cardshellz": {
+        "name": "Cardshellz",
+        "description": "Protective cases and card shells",
+        "url": "https://www.cardshellz.com/collections/all",
+    },
+}
+
+
+def supplies_affiliate_url(key: str) -> str:
+    """Return the affiliate-wrapped URL for a supplies partner."""
+    entry = SUPPLIES_LINKS.get(key)
+    if not entry:
+        return ""
+    return affiliate_url(entry["url"])

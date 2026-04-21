@@ -6,6 +6,7 @@ import streamlit as st
 from modules.ui_helpers import (
     render_listing_row, render_sold_row, render_market_summary,
     gradient_divider, market_signal_badge, ebay_button, tcgplayer_button,
+    whatnot_button, topps_button, beckett_button, drip_shop_button,
 )
 from modules.player_stats import search_players, get_multi_season_stats, format_player_info
 from modules.ebay_search import search_ebay_cards, search_ebay_sold, flag_deals, get_market_summary
@@ -13,7 +14,11 @@ from modules.pokemon_tcg import search_pokemon_cards, get_pokemon_market_price, 
 from modules.price_history import get_price_history, build_price_chart
 from modules.psa_population import lookup_psa_population
 from modules.card_types import get_card_type_options
-from modules.affiliates import affiliate_url, tcgplayer_search_affiliate_url
+from modules.affiliates import (
+    affiliate_url, tcgplayer_search_affiliate_url,
+    whatnot_search_affiliate_url, topps_search_affiliate_url,
+    beckett_search_affiliate_url, drip_shop_search_affiliate_url,
+)
 from modules.ui_helpers import render_table
 from config.settings import SPORTS
 from tiers import check_usage_limit, increment_and_check, render_limit_warning, render_disclaimer, render_contextual_upsell, is_pro
@@ -167,6 +172,17 @@ def _render_pokemon_results(card_name: str, demo_mode: bool):
     else:
         st.info("No graded listings found on eBay for this card.")
 
+    # "Also Available On" — Pokemon (no Topps)
+    gradient_divider()
+    st.markdown("#### Also Available On")
+    _pm1, _pm2, _pm3 = st.columns(3)
+    with _pm1:
+        st.markdown(whatnot_button(whatnot_search_affiliate_url(card_name, "Pokemon")), unsafe_allow_html=True)
+    with _pm2:
+        st.markdown(beckett_button(beckett_search_affiliate_url(card_name, "Pokemon")), unsafe_allow_html=True)
+    with _pm3:
+        st.markdown(drip_shop_button(drip_shop_search_affiliate_url(card_name, "Pokemon")), unsafe_allow_html=True)
+
 
 # ============================================================
 # Sports-specific search & display (original flow)
@@ -316,6 +332,19 @@ def _render_sports_results(player_query: str, sport: str, demo_mode: bool):
             render_listing_row(listing)
     else:
         st.info("No listings found for this player.")
+
+    # "Also Available On" — Sports (includes Topps)
+    gradient_divider()
+    st.markdown("#### Also Available On")
+    _sm1, _sm2, _sm3, _sm4 = st.columns(4)
+    with _sm1:
+        st.markdown(whatnot_button(whatnot_search_affiliate_url(player_name, sport)), unsafe_allow_html=True)
+    with _sm2:
+        st.markdown(topps_button(topps_search_affiliate_url(player_name, sport)), unsafe_allow_html=True)
+    with _sm3:
+        st.markdown(beckett_button(beckett_search_affiliate_url(player_name, sport)), unsafe_allow_html=True)
+    with _sm4:
+        st.markdown(drip_shop_button(drip_shop_search_affiliate_url(player_name, sport)), unsafe_allow_html=True)
 
     gradient_divider()
     st.markdown("#### Recent Sales")

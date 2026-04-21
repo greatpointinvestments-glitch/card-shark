@@ -122,6 +122,31 @@ def tcgplayer_button(url: str) -> str:
     return f'<a href="{aff_url}" target="_blank" class="tcgplayer-btn">Buy on TCGPlayer</a>'
 
 
+def whatnot_button(url: str) -> str:
+    """Return a styled Whatnot button."""
+    return f'<a href="{url}" target="_blank" class="whatnot-btn">Watch on Whatnot</a>'
+
+
+def topps_button(url: str) -> str:
+    """Return a styled Topps button."""
+    return f'<a href="{url}" target="_blank" class="topps-btn">Shop Topps</a>'
+
+
+def beckett_button(url: str) -> str:
+    """Return a styled Beckett button."""
+    return f'<a href="{url}" target="_blank" class="beckett-btn">Price Guide</a>'
+
+
+def drip_shop_button(url: str) -> str:
+    """Return a styled Drip Shop Live button."""
+    return f'<a href="{url}" target="_blank" class="drip-shop-btn">Watch Live</a>'
+
+
+def supplies_button(url: str, label: str = "Shop") -> str:
+    """Return a styled green supplies button."""
+    return f'<a href="{url}" target="_blank" class="supplies-btn">{label}</a>'
+
+
 def marketplace_button(url: str, sport: str = "") -> str:
     """Return the correct marketplace button based on sport context."""
     if sport == "Pokemon" and "tcgplayer.com" in (url or ""):

@@ -118,6 +118,7 @@ _MISSED_OPPORTUNITY_HOOKS = {
     "Grading Calculator": "Avg Pro user avoids $40 in bad PSA submissions per month.",
     "Player Comparison": "Side-by-side ROI for any two players — find the better investment in 10 seconds.",
     "Price Alerts": "Pro users set alerts and bought 3 cards at 30%+ discounts this week.",
+    "Card Scanner": "Pro scanner uses AI vision to read player, set, condition, and variant with high accuracy.",
 }
 
 
@@ -213,6 +214,7 @@ def render_contextual_upsell(context: str):
         "breakout_leaderboard": "Pro users see the full leaderboard and get early breakout alerts.",
         "trade_checker": "Pro users get unlimited trade checks and deeper market analysis.",
         "my_collection": "Pro users track unlimited cards with CSV export and full analytics.",
+        "card_scanner": "Pro scanner uses AI vision for higher accuracy — identifies condition, variant, and more.",
     }
     copy = _UPSELL_COPY.get(context, "Pro users get the full experience — unlimited everything.")
     st.markdown(
