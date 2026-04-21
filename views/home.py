@@ -24,9 +24,14 @@ def render(current_user: str | None):
 
     # --- Landing Hero (for visitors) ---
     if not current_user:
-        st.markdown("""
+        import base64, os
+        _logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "card-shark-logo.png")
+        with open(_logo_path, "rb") as _f:
+            _logo_b64 = base64.b64encode(_f.read()).decode()
+        st.markdown(f"""
         <div style="text-align:center; padding: 40px 20px 10px 20px;">
-            <h1 style="font-size:3em; margin-bottom:0;">🦈 Card Shark</h1>
+            <img src="data:image/png;base64,{_logo_b64}" style="width:120px;height:120px;margin-bottom:8px;" />
+            <h1 style="font-size:3em; margin-bottom:0;">Card Shark</h1>
             <p style="font-size:1.4em; color:#9ca3af; margin-top:8px;">
                 Scan any card. Know what it's worth. Find the deals everyone else misses.
             </p>
@@ -114,7 +119,8 @@ def render(current_user: str | None):
 
         gradient_divider()
     else:
-        st.title("🦈 Card Shark")
+        st.image("assets/card-shark-logo.png", width=80)
+        st.title("Card Shark")
         st.markdown("#### Find steals. Spot breakouts. Trade smarter.")
 
         # First-visit onboarding banner

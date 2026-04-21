@@ -23,7 +23,7 @@ from views import (
 # --- Page Config ---
 st.set_page_config(
     page_title="Card Shark",
-    page_icon="🦈",
+    page_icon="assets/card-shark-logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -438,7 +438,8 @@ st.markdown("""
 
 
 # --- Sidebar Navigation ---
-st.sidebar.title("🦈 Card Shark")
+st.sidebar.image("assets/card-shark-logo.png", width=80)
+st.sidebar.title("Card Shark")
 st.sidebar.caption("Your Edge in the Hobby")
 
 # --- Auth ---
