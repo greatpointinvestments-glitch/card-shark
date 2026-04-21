@@ -3,7 +3,10 @@
 import streamlit as st
 
 from modules.league_leaders import (
-    get_leaders, is_nfl_offseason, get_nfl_display_season,
+    get_leaders,
+    is_nba_offseason, get_nba_display_season,
+    is_mlb_offseason, get_mlb_display_season,
+    is_nfl_offseason, get_nfl_display_season,
     SPORT_CATEGORIES,
 )
 from modules.affiliates import ebay_search_affiliate_url
@@ -24,9 +27,15 @@ def render():
         default_idx = 0
         category = st.selectbox("Stat Category", categories, index=default_idx, key="ll_cat")
 
-    # --- NFL offseason banner ---
-    if sport == "NFL" and is_nfl_offseason():
-        nfl_year, nfl_label = get_nfl_display_season()
+    # --- Offseason banners ---
+    if sport == "NBA" and is_nba_offseason():
+        _, nba_label = get_nba_display_season()
+        st.info(f"NBA offseason — showing **{nba_label}** final leaders.")
+    elif sport == "MLB" and is_mlb_offseason():
+        _, mlb_label = get_mlb_display_season()
+        st.info(f"MLB offseason — showing **{mlb_label}** final leaders.")
+    elif sport == "NFL" and is_nfl_offseason():
+        _, nfl_label = get_nfl_display_season()
         st.info(f"NFL offseason — showing **{nfl_label}** final leaders.")
 
     gradient_divider()

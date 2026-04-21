@@ -13,33 +13,61 @@ import streamlit as st
 
 
 # --- Season helpers ---
+# Each sport: detect if currently in-season, return the right year/label.
+# In-season  → current season, no banner
+# Off-season → most recent completed season, with "(Final)" banner
 
-def get_current_nba_season() -> str:
-    """Return current NBA season string like '2025-26'.
-    Season starts in October, so Oct-Dec uses current year."""
+# NBA: regular season Oct–Apr, playoffs Apr–Jun, offseason Jul–Sep
+def is_nba_offseason() -> bool:
+    return datetime.now().month in (7, 8, 9)
+
+
+def get_nba_display_season() -> tuple[str, str]:
+    """Return (season_string, label). Season string like '2025-26'."""
     now = datetime.now()
     if now.month >= 10:
         start = now.year
     else:
         start = now.year - 1
     end_short = str(start + 1)[-2:]
-    return f"{start}-{end_short}"
+    season = f"{start}-{end_short}"
+    if is_nba_offseason():
+        return season, f"{start}-{start + 1} Season (Final)"
+    return season, f"{start}-{start + 1} Season"
+
+
+def get_current_nba_season() -> str:
+    return get_nba_display_season()[0]
+
+
+# MLB: regular season Apr–Oct (roughly), offseason Nov–Mar
+def is_mlb_offseason() -> bool:
+    return datetime.now().month in (11, 12, 1, 2, 3)
+
+
+def get_mlb_display_season() -> tuple[int, str]:
+    """Return (year, label)."""
+    now = datetime.now()
+    if is_mlb_offseason():
+        # Nov–Dec: just-finished season is this year
+        # Jan–Mar: just-finished season is last year
+        year = now.year if now.month >= 11 else now.year - 1
+        return year, f"{year} Season (Final)"
+    return now.year, f"{now.year} Season"
 
 
 def get_current_mlb_season() -> int:
-    """Return current MLB season year. Season runs ~March-October."""
-    return datetime.now().year
+    return get_mlb_display_season()[0]
 
 
+# NFL: regular season Sep–Jan (Super Bowl early Feb), offseason Feb–Aug
 def is_nfl_offseason() -> bool:
-    """NFL regular season roughly Sep-Jan. Feb-Aug is offseason."""
     month = datetime.now().month
-    return month >= 2 and month <= 8
+    return 2 <= month <= 8
 
 
 def get_nfl_display_season() -> tuple[int, str]:
-    """Return (year, label) for NFL display.
-    During offseason shows prior season with a note."""
+    """Return (year, label). NFL season named by start year (e.g. 2025 season)."""
     now = datetime.now()
     if is_nfl_offseason():
         year = now.year - 1 if now.month <= 8 else now.year
