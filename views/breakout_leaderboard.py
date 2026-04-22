@@ -93,14 +93,35 @@ def render(demo_mode: bool = False):
     st.title("🚀 Breakout Leaderboard")
     st.caption("Find tomorrow's stars before everyone else")
 
-    breakout_sport = st.selectbox("Sport", ["NBA", "NFL", "MLB"], key="breakout_sport")
-    breakout_watchlist = BREAKOUT_WATCHLISTS[breakout_sport]
+    sport_filter = st.multiselect("Filter by Sport", ["NBA", "NFL", "MLB"], default=["NBA", "NFL", "MLB"], key="breakout_sports")
 
-    leaderboard = build_leaderboard(breakout_watchlist, breakout_sport)
+    # Build leaderboard across selected sports
+    leaderboard = []
+    all_watchlist = []
+    trends = {}
+    for sport in sport_filter:
+        wl = BREAKOUT_WATCHLISTS.get(sport, [])
+        all_watchlist.extend(wl)
+        lb = build_leaderboard(wl, sport)
+        for p in lb:
+            p["sport"] = sport
+        leaderboard.extend(lb)
+
+    # Re-sort and re-rank across all sports
+    leaderboard.sort(key=lambda x: x["score"], reverse=True)
+    for i, p in enumerate(leaderboard):
+        p["rank"] = i + 1
 
     if not leaderboard:
         st.error("Could not build leaderboard.")
         return
+
+    # Fetch trends per sport
+    with st.spinner("Loading market trends..."):
+        for sport in sport_filter:
+            sport_names = tuple(p["name"] for p in leaderboard if p["sport"] == sport)
+            if sport_names:
+                trends.update(get_leaderboard_trends(sport_names, sport))
 
     buy_count = sum(1 for p in leaderboard if p["signal"] == "BUY")
     watch_count = sum(1 for p in leaderboard if p["signal"] == "WATCH")
@@ -119,7 +140,7 @@ def render(demo_mode: bool = False):
 
     if not is_pro() and len(filtered) > 10:
         full_count = len(filtered)
-        _teaser_rows = filtered[10:12]  # 2 blurred teaser rows
+        _teaser_rows = filtered[10:12]
         filtered = filtered[:10]
         _show_leaderboard_upsell = True
     else:
@@ -127,25 +148,21 @@ def render(demo_mode: bool = False):
         _teaser_rows = []
         full_count = 0
 
-    player_names_tuple = tuple(p["name"] for p in leaderboard)
-    with st.spinner("Loading market trends..."):
-        trends = get_leaderboard_trends(player_names_tuple, breakout_sport)
-
     # Track which player is expanded
     expanded_player = st.session_state.get("bl_expanded")
 
-    hdr = st.columns([0.5, 2.5, 1.5, 1, 1, 1, 1.5, 1.5])
+    hdr = st.columns([0.5, 2.5, 1, 1.5, 1, 1, 1, 1.5])
     hdr[0].caption("Rank")
     hdr[1].caption("Player")
-    hdr[2].caption("Team")
-    hdr[3].caption("Age")
-    hdr[4].caption("Draft")
+    hdr[2].caption("Sport")
+    hdr[3].caption("Team")
+    hdr[4].caption("Age")
     hdr[5].caption("Score")
     hdr[6].caption("Signal")
-    hdr[7].caption("Price Trend (90d)")
+    hdr[7].caption("Price Trend")
 
     for player in filtered:
-        cols = st.columns([0.5, 2.5, 1.5, 1, 1, 1, 1.5, 1.5])
+        cols = st.columns([0.5, 2.5, 1, 1.5, 1, 1, 1, 1.5])
         with cols[0]:
             st.write(f"**#{player['rank']}**")
         with cols[1]:
@@ -159,12 +176,11 @@ def render(demo_mode: bool = False):
                     st.session_state["bl_expanded"] = player["name"]
                 st.rerun()
         with cols[2]:
-            st.write(player["team"])
+            st.write(player["sport"])
         with cols[3]:
-            st.write(f"Age {player['age']}")
+            st.write(player["team"])
         with cols[4]:
-            pick = player.get('draft_pick')
-            st.write(f"Pick #{pick}" if pick is not None else "Intl")
+            st.write(f"Age {player['age']}")
         with cols[5]:
             st.write(f"**{player['score']}**")
             st.markdown(score_progress_bar(player['score']), unsafe_allow_html=True)
@@ -180,7 +196,7 @@ def render(demo_mode: bool = False):
         # Inline Deep Dive expander
         if expanded_player == player["name"]:
             st.markdown("---")
-            _render_deep_dive(player["name"], breakout_sport, breakout_watchlist, demo_mode)
+            _render_deep_dive(player["name"], player["sport"], all_watchlist, demo_mode)
             st.markdown("---")
 
     # Blurred teaser rows + upgrade CTA
@@ -188,18 +204,17 @@ def render(demo_mode: bool = False):
         if _teaser_rows:
             st.markdown('<div class="teaser-blur">', unsafe_allow_html=True)
             for player in _teaser_rows:
-                cols = st.columns([0.5, 2.5, 1.5, 1, 1, 1, 1.5, 1.5])
+                cols = st.columns([0.5, 2.5, 1, 1.5, 1, 1, 1, 1.5])
                 with cols[0]:
                     st.write(f"**#{player['rank']}**")
                 with cols[1]:
                     st.write(f"**{player['name']}**")
                 with cols[2]:
-                    st.write(player["team"])
+                    st.write(player["sport"])
                 with cols[3]:
-                    st.write(f"Age {player['age']}")
+                    st.write(player["team"])
                 with cols[4]:
-                    pick = player.get('draft_pick')
-                    st.write(f"Pick #{pick}" if pick is not None else "Intl")
+                    st.write(f"Age {player['age']}")
                 with cols[5]:
                     st.write(f"**{player['score']}**")
                 with cols[6]:
