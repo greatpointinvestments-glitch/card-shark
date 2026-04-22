@@ -17,7 +17,7 @@ import streamlit as st
 from modules.breakout_engine import build_leaderboard
 from modules.ebay_search import search_ebay_cards, search_ebay_sold
 from modules.listing_quality import (
-    is_suspect, listings_match, confidence_score, confidence_label,
+    is_suspect, is_chase_pack, listings_match, confidence_score, confidence_label,
     extract_parallel, is_graded, is_rookie, extract_grade,
 )
 from data.watchlists import (
@@ -76,6 +76,7 @@ def find_flip_opportunities(
     max_players_per_sport: int = 5,
     max_results: int = 20,
     min_confidence: int = 60,
+    exclude_chase: bool = True,
 ) -> list[dict]:
     """Find active BIN listings priced below same-variation sold comps.
 
@@ -122,6 +123,7 @@ def find_flip_opportunities(
                 if l.get("buying_format") == "BIN"
                 and l.get("total", 0) > 0
                 and not is_suspect(l.get("title", ""))
+                and (not exclude_chase or not is_chase_pack(l.get("title", "")))
                 and _seller_passes(l)
             ]
 

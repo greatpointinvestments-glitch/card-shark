@@ -8,4 +8,5 @@ anthropic>=0.39.0
 stripe>=8.0.0
 bcrypt>=4.1.0
 pytesseract>=0.3.10
+rapidfuzz>=3.0.0
 # No additional packages needed for NFL/MLB — uses free public APIs via requests

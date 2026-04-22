@@ -4,7 +4,8 @@ import streamlit as st
 
 from modules.card_scanner import smart_scan, build_collection_entry_from_scan
 from modules.portfolio import add_card
-from modules.ui_helpers import gradient_divider, whatnot_button, topps_button, drip_shop_button, ebay_button
+from modules.trade_analyzer import get_card_market_value
+from modules.ui_helpers import gradient_divider, whatnot_button, topps_button, drip_shop_button, ebay_button, market_signal_badge, render_fuzzy_suggestions
 from modules.affiliates import (
     ebay_search_affiliate_url, whatnot_search_affiliate_url,
     topps_search_affiliate_url, drip_shop_search_affiliate_url,
@@ -89,6 +90,30 @@ def render():
 
             st.markdown('</div>', unsafe_allow_html=True)
 
+            # --- Estimated Value lookup ---
+            _scan_sport = result.get("sport", "NBA")
+            _scan_player = result.get("player_name", "")
+            _scan_variant = result.get("variant", "Base")
+            _scan_year = result.get("year")
+            _scan_set = result.get("set_name")
+            _suggested_price = 0.0
+
+            if _scan_player:
+                with st.spinner("Looking up market value..."):
+                    _market = get_card_market_value(
+                        _scan_player, _scan_sport, _scan_variant,
+                        year=_scan_year, set_name=_scan_set,
+                    )
+                if _market.get("avg_sold", 0) > 0 or _market.get("avg_active", 0) > 0:
+                    _suggested_price = _market["avg_sold"] if _market["avg_sold"] > 0 else _market["avg_active"]
+                    st.markdown("#### Estimated Value")
+                    vm1, vm2, vm3, vm4 = st.columns(4)
+                    vm1.metric("Avg Sold", f"${_market['avg_sold']:.2f}")
+                    vm2.metric("Avg Active", f"${_market['avg_active']:.2f}")
+                    vm3.metric("90d Volume", f"{_market['sold_volume']} sales")
+                    vm4.markdown("**Market Signal**")
+                    vm4.markdown(market_signal_badge(_market["market_signal"]), unsafe_allow_html=True)
+
             # "Find This Card" marketplace search buttons
             player_name = result.get("player_name")
             detected_sport = result.get("sport", "")
@@ -116,6 +141,14 @@ def render():
             st.markdown("#### Confirm & Add to Collection")
             st.caption("Edit any fields below before adding to your collection")
 
+            # Fuzzy suggestion for scanned player name
+            _scanned_name = result.get("player_name", "")
+            if _scanned_name:
+                _scan_suggestion = render_fuzzy_suggestions(_scanned_name, result.get("sport"), key_prefix="sc_fz")
+                if _scan_suggestion:
+                    result["player_name"] = _scan_suggestion
+                    st.rerun()
+
             with st.form("scanner_add_form", clear_on_submit=True):
                 sc1, sc2, sc3 = st.columns(3)
                 with sc1:
@@ -138,7 +171,7 @@ def render():
 
                 sc7, sc8 = st.columns(2)
                 with sc7:
-                    scan_price = st.number_input("Purchase Price ($)", min_value=0.0, step=1.0, key="scan_price")
+                    scan_price = st.number_input("Purchase Price ($)", min_value=0.0, value=round(_suggested_price, 2), step=1.0, key="scan_price")
                 with sc8:
                     scan_date = st.date_input("Purchase Date", key="scan_date")
 

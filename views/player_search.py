@@ -7,6 +7,7 @@ from modules.ui_helpers import (
     render_listing_row, render_sold_row, render_market_summary,
     gradient_divider, market_signal_badge, ebay_button, tcgplayer_button,
     whatnot_button, topps_button, beckett_button, drip_shop_button,
+    render_fuzzy_suggestions,
 )
 from modules.player_stats import search_players, get_multi_season_stats, format_player_info
 from modules.ebay_search import search_ebay_cards, search_ebay_sold, flag_deals, get_market_summary
@@ -78,6 +79,14 @@ def render(demo_mode: bool = False):
         _placeholder = "e.g. Charizard" if sport == "Pokemon" else "e.g. LeBron James"
         player_query = st.text_input(_label, placeholder=_placeholder,
                                      value=display_value)
+
+    # Fuzzy search suggestions
+    if player_query:
+        suggestion = render_fuzzy_suggestions(player_query, sport, key_prefix="ps_fz")
+        if suggestion:
+            st.session_state.prefill_player = suggestion
+            st.session_state.prefill_sport = sport
+            st.rerun()
 
     if st.session_state.search_history:
         st.caption("Recent searches:")

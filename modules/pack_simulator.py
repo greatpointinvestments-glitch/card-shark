@@ -81,6 +81,43 @@ def _estimate_card_value(player_name: str, sport: str, card_type: str) -> float:
     return round(base_value * multiplier * random.uniform(0.7, 1.3), 2)
 
 
+def _fetch_card_image(player_name: str, sport: str, card_type: str = "") -> str:
+    """Fetch a card image URL. Pokemon: TCG API. Sports: eBay thumbnail (limit=1)."""
+    cache_key = f"img_{player_name}_{sport}_{card_type}"
+
+    # Check session cache
+    try:
+        import streamlit as st
+        if cache_key in st.session_state:
+            return st.session_state[cache_key]
+    except Exception:
+        pass
+
+    image_url = ""
+    try:
+        if sport == "Pokemon":
+            from modules.pokemon_tcg import search_pokemon_cards
+            cards = search_pokemon_cards(player_name, limit=1)
+            if cards and cards[0].get("image_small"):
+                image_url = cards[0]["image_small"]
+        else:
+            from modules.ebay_search import search_ebay_cards
+            listings = search_ebay_cards(player_name, sport, card_type, limit=1)
+            if listings and listings[0].get("image_url"):
+                image_url = listings[0]["image_url"]
+    except Exception:
+        pass
+
+    # Cache in session state
+    try:
+        import streamlit as st
+        st.session_state[cache_key] = image_url
+    except Exception:
+        pass
+
+    return image_url
+
+
 def _pick_tier(tiers: list[dict], rng: random.Random) -> dict:
     """Weighted random tier selection."""
     weights = [t["weight"] for t in tiers]
@@ -105,6 +142,9 @@ def rip_pack(product_key: str) -> list[dict]:
 
         value = _estimate_card_value(player_name, sport, tier["card_type"])
 
+        # Fetch card image (hits get priority, base cards get images too)
+        image_url = _fetch_card_image(player_name, sport, tier["card_type"])
+
         cards.append({
             "player_name": player_name,
             "team": player.get("team", "N/A"),
@@ -113,6 +153,7 @@ def rip_pack(product_key: str) -> list[dict]:
             "tier_name": tier["name"],
             "is_hit": tier["is_hit"],
             "value": value,
+            "image_url": image_url,
         })
 
     return cards

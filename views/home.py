@@ -123,6 +123,52 @@ def render(current_user: str | None):
         st.title("Card Shark")
         st.markdown("#### Find steals. Spot breakouts. Trade smarter.")
 
+        # --- Collection Summary Card (logged-in users) ---
+        from modules.portfolio import get_portfolio
+        _home_portfolio = get_portfolio()
+        if _home_portfolio:
+            _pv = st.session_state.get("portfolio_values", {})
+            _total_cards = len(_home_portfolio)
+            _total_cost = sum(c.get("purchase_price", 0) * c.get("quantity", 1) for c in _home_portfolio)
+            _total_current = 0
+            _has_market_data = bool(_pv)
+            if _has_market_data:
+                for c in _home_portfolio:
+                    mv = _pv.get(c["id"], 0)
+                    _total_current += mv * c.get("quantity", 1) if mv > 0 else c.get("purchase_price", 0) * c.get("quantity", 1)
+            else:
+                _total_current = _total_cost
+
+            _pl = _total_current - _total_cost
+            _pl_pct = (_pl / _total_cost * 100) if _total_cost > 0 else 0
+            _pl_color = "#22c55e" if _pl >= 0 else "#ef4444"
+            _pl_sign = "+" if _pl >= 0 else ""
+
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#1a1f2e,#2d3748);border-radius:12px;'
+                f'padding:16px 20px;margin:10px 0;border:1px solid #3b4560;">'
+                f'<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">'
+                f'<div>'
+                f'<strong style="font-size:1.1em;">My Collection</strong> &nbsp;'
+                f'<span style="color:#9ca3af;">{_total_cards} cards</span>'
+                f'</div>'
+                f'<div style="display:flex;gap:20px;align-items:center;">'
+                f'<span style="color:#9ca3af;">Value: <strong>${_total_current:,.2f}</strong></span>'
+                f'<span style="color:{_pl_color};font-weight:bold;">'
+                f'{_pl_sign}${_pl:,.2f} ({_pl_sign}{_pl_pct:.1f}%)</span>'
+                f'</div></div></div>',
+                unsafe_allow_html=True,
+            )
+            if not _has_market_data:
+                st.caption("Visit My Collection to refresh market values")
+            _hc1, _hc2 = st.columns(2)
+            with _hc1:
+                if st.button("Open My Collection", key="home_coll_nav", use_container_width=True):
+                    st.session_state.nav_target = "📁 My Collection"
+                    st.rerun()
+            with _hc2:
+                st.write("")
+
         # First-visit onboarding banner
         if not st.session_state.get("onboarding_dismissed"):
             from auth import get_user_info
@@ -275,6 +321,8 @@ def render(current_user: str | None):
          "Challenge a friend. 5 categories. 100 points. Who wins?", False),
         ("📐 Grading Calculator", "feature-card-grading", "Calculate ROI", "home_grading", "📐 Grading Calculator",
          "Should you send it to PSA? Find out before you spend.", True),
+        ("🏅 Award Races", "feature-card-awards", "See Odds", "home_awards", "🥇 League Leaders",
+         "MVP, ROY, Cy Young — who's winning the races and which cards to buy", False),
         ("🏟️ Live Games", "feature-card-games", "Track Games", "home_games", "🏟️ Live Games",
          "Your players in action — live scores, alerts when they go off", False),
         ("📷 Card Scanner", "feature-card-scanner", "Scan a Card", "home_scanner", "📷 Card Scanner",

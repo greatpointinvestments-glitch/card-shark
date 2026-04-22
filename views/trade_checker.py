@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from modules.ui_helpers import gradient_divider, market_signal_badge
+from modules.ui_helpers import gradient_divider, market_signal_badge, render_fuzzy_suggestions
 from modules.trade_analyzer import get_card_market_value, compute_trade_grade
 from modules.card_scanner import scan_card_image, _anthropic_is_configured
 from modules.card_types import get_card_type_options
@@ -119,6 +119,14 @@ def _render_card_input(side_key, side_label):
 
 def _render_manual_input(side_key):
     """Manual entry form with specific card details for accurate lookups."""
+    # Fuzzy suggestion outside the form
+    _fz_query = st.session_state.get(f"manual_player_{side_key}", "")
+    if _fz_query:
+        _fz_pick = render_fuzzy_suggestions(_fz_query, key_prefix=f"tc_fz_{side_key}")
+        if _fz_pick:
+            st.session_state[f"manual_player_{side_key}"] = _fz_pick
+            st.rerun()
+
     with st.form(f"{side_key}_manual_form", clear_on_submit=True):
         player = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama",
                                key=f"manual_player_{side_key}")

@@ -22,6 +22,19 @@ def render():
 
     _user_is_pro = is_pro()
 
+    with st.expander("How Battles Work"):
+        st.markdown("""
+**Collection Battles compare two users across 5 categories, each worth 20 points (100 total):**
+
+1. **Total Value** — Sum of all purchase prices in your collection. Bigger portfolio wins.
+2. **Best Card** — Your single most valuable card. Quality over quantity.
+3. **Biggest Gainer** — Card with the highest P&L % vs. current market price. Smart picks win.
+4. **Diversification** — How spread out your collection is across sports and card types. Balanced beats one-dimensional.
+5. **Collection Size** — Total number of cards. Collectors who keep buying win this one.
+
+Each category: **Winner gets 20 pts**, loser gets 0. Ties split 10-10. Highest total wins.
+        """)
+
     # --- Create or Join ---
     st.markdown("### Start a Battle")
     b1, b2 = st.columns(2)
@@ -136,6 +149,14 @@ def render():
             )
 
         # Category breakdown
+        _CAT_EXPLANATIONS = {
+            "Total Value": "Sum of all card purchase prices",
+            "Best Card": "Highest-value single card",
+            "Biggest Gainer": "Best P&L % from real market data",
+            "Diversification": "Sports & card type variety (out of 100)",
+            "Collection Size": "Total cards in collection",
+        }
+
         st.markdown("#### Category Breakdown")
         for cat in result["categories"]:
             cc1, cc2, cc3 = st.columns([2, 2, 2])
@@ -146,7 +167,14 @@ def render():
                 val = _fmt_display(cat["val_a"], cat["name"])
                 st.markdown(f'<span style="{style}">{val}</span>', unsafe_allow_html=True)
             with cc2:
-                st.markdown(f'<div style="text-align:center;color:#9ca3af;">{cat["name"]}</div>', unsafe_allow_html=True)
+                explanation = _CAT_EXPLANATIONS.get(cat["name"], "")
+                st.markdown(
+                    f'<div style="text-align:center;">'
+                    f'<span style="color:#e5e7eb;">{cat["name"]}</span><br>'
+                    f'<span style="color:#6b7280;font-size:0.75em;">{explanation}</span>'
+                    f'</div>',
+                    unsafe_allow_html=True,
+                )
             with cc3:
                 style = "font-weight:bold;color:#22c55e;" if b_won else ""
                 val = _fmt_display(cat["val_b"], cat["name"])

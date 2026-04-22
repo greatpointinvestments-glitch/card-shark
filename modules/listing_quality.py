@@ -23,6 +23,20 @@ _SUSPECT_PATTERNS = re.compile(
     re.IGNORECASE,
 )
 
+# Chase/mystery pack patterns — separate from suspect so they can be toggled
+_CHASE_PACK_PATTERNS = re.compile(
+    r"\b(chase pack|hot pack|value pack|break spot|"
+    r"random team|random player|mystery box|mystery pack|hit or miss)\b",
+    re.IGNORECASE,
+)
+
+
+def is_chase_pack(title: str) -> bool:
+    """Return True if the listing title looks like a chase/mystery pack."""
+    if not title:
+        return False
+    return bool(_CHASE_PACK_PATTERNS.search(title))
+
 # "Auction" listings hide real prices behind opening bids + shill risk
 # (handled in flip_finder by requiring BIN, but we expose a helper anyway)
 

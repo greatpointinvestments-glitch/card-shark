@@ -147,7 +147,8 @@ def compute_battle(user_a: str, user_b: str) -> dict:
 
 
 def _compute_portfolio_stats(portfolio: list[dict]) -> dict:
-    """Compute stats needed for battle scoring."""
+    """Compute stats needed for battle scoring. Uses real market data for up to
+    10 cards per user to keep API calls manageable."""
     if not portfolio:
         return {
             "total_value": 0,
@@ -160,12 +161,17 @@ def _compute_portfolio_stats(portfolio: list[dict]) -> dict:
             "sports": [],
         }
 
+    # Limit market lookups to first 10 cards
+    from modules.trade_analyzer import get_card_market_value
+
     total_value = 0
     best_card_value = 0
     best_card_name = ""
     best_gainer_pct = 0
     best_gainer_name = ""
     sports = set()
+
+    lookup_cards = portfolio[:10]
 
     for card in portfolio:
         price = card.get("purchase_price", 0)
@@ -178,12 +184,22 @@ def _compute_portfolio_stats(portfolio: list[dict]) -> dict:
             best_card_value = card_value
             best_card_name = card.get("player_name", "Unknown")
 
-        # Simple gainer: assume 10% random fluctuation for demo
-        # In production, would use get_card_market_value
-        gainer_pct = random.uniform(-15, 30)
-        if gainer_pct > best_gainer_pct:
-            best_gainer_pct = gainer_pct
-            best_gainer_name = card.get("player_name", "Unknown")
+        # Real market P&L for cards in the lookup set
+        if card in lookup_cards:
+            try:
+                market = get_card_market_value(
+                    card.get("player_name", ""), card.get("sport", "NBA"),
+                    card.get("card_type", "Base"),
+                    year=card.get("year"), set_name=card.get("set_name"),
+                )
+                market_val = market.get("avg_sold", 0) or market.get("avg_active", 0)
+                if market_val > 0 and price > 0:
+                    gainer_pct = ((market_val - price) / price) * 100
+                    if gainer_pct > best_gainer_pct:
+                        best_gainer_pct = gainer_pct
+                        best_gainer_name = card.get("player_name", "Unknown")
+            except Exception:
+                pass
 
     # Diversification: count unique sports + card types
     card_types = set(c.get("card_type", "") for c in portfolio)

@@ -270,6 +270,27 @@ def render_sold_row(listing: dict):
         st.write(listing.get("listing_type", ""))
 
 
+def render_fuzzy_suggestions(query: str, sport: str | None = None, key_prefix: str = "fz"):
+    """Render 'Did you mean:' chips if query doesn't exactly match known players.
+    Returns the selected suggestion name if clicked, else None."""
+    from modules.fuzzy_search import suggest_players, has_exact_match
+    if not query or has_exact_match(query, sport):
+        return None
+    suggestions = suggest_players(query, sport, limit=4)
+    if not suggestions:
+        return None
+    st.markdown(
+        '<span style="color:#9ca3af;font-size:0.9em;">Did you mean:</span>',
+        unsafe_allow_html=True,
+    )
+    cols = st.columns(min(len(suggestions), 4))
+    for i, s in enumerate(suggestions):
+        with cols[i]:
+            if st.button(s["name"], key=f"{key_prefix}_{i}_{s['name']}", use_container_width=True):
+                return s["name"]
+    return None
+
+
 def render_market_summary(summary: dict, demo_mode: bool = False):
     """Render market analytics as a 4-column metric row."""
     demo_tag = " (Sample)" if demo_mode else ""

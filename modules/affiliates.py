@@ -65,7 +65,7 @@ def detect_marketplace(url: str) -> str:
         return "whatnot"
     if "topps.com" in host:
         return "topps"
-    if "beckett.com" in host:
+    if "beckett.com" in host or "marketplace.beckett.com" in host:
         return "beckett"
     if "bcwsupplies.com" in host:
         return "bcw"
@@ -73,7 +73,7 @@ def detect_marketplace(url: str) -> str:
         return "zion"
     if "cardshellz.com" in host:
         return "cardshellz"
-    if "dripshoplive.com" in host:
+    if "dripshoplive.com" in host or "dripshop.live" in host:
         return "drip_shop"
     return "unknown"
 
@@ -265,12 +265,12 @@ def topps_search_affiliate_url(player_name: str, sport: str = "") -> str:
 
 
 def beckett_search_affiliate_url(player_name: str, sport: str = "") -> str:
-    """Generate a Beckett price guide search URL."""
+    """Generate a Beckett marketplace search URL."""
     query_parts = [player_name]
     if sport:
         query_parts.append(sport)
     query = quote_plus(" ".join(query_parts))
-    base = f"https://www.beckett.com/search?term={query}"
+    base = f"https://marketplace.beckett.com/search_new/?term={query}"
     return affiliate_url(base)
 
 
@@ -280,7 +280,7 @@ def drip_shop_search_affiliate_url(player_name: str, sport: str = "") -> str:
     if sport:
         query_parts.append(sport)
     query = quote_plus(" ".join(query_parts))
-    base = f"https://www.dripshoplive.com/search?q={query}"
+    base = f"https://www.dripshop.live/search?q={query}"
     return affiliate_url(base)
 
 

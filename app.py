@@ -35,6 +35,100 @@ st.markdown('<meta name="impact-site-verification" value="7f5de73e-561a-4412-be2
 # --- Custom CSS ---
 st.markdown("""
 <style>
+    /* --- v8.0 Visual Overhaul --- */
+
+    /* Typography — Google Fonts Inter */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+    html, body, [class*="css"] {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+    }
+
+    /* Glassmorphism content containers */
+    div[data-testid="stExpander"],
+    .stForm {
+        background: rgba(255, 255, 255, 0.03) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Metric card styling */
+    div[data-testid="stMetric"] {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 12px 16px;
+    }
+    div[data-testid="stMetric"]:hover {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: rgba(245, 158, 11, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    /* Sidebar gradient + hover */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0f172a, #1e293b) !important;
+    }
+    section[data-testid="stSidebar"] label:hover {
+        color: #f59e0b !important;
+        transition: color 0.15s;
+    }
+
+    /* Page fade-in animation */
+    .main .block-container {
+        animation: pageFadeIn 0.4s ease-out;
+    }
+    @keyframes pageFadeIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section headers with bottom border */
+    .main h3 {
+        border-bottom: 2px solid rgba(245, 158, 11, 0.3);
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+    }
+
+    /* Primary buttons — gold gradient */
+    .stButton > button[kind="primary"],
+    button[data-testid="stFormSubmitButton"] {
+        background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+        color: #1f2937 !important;
+        font-weight: 700 !important;
+        border: none !important;
+        transition: transform 0.15s, box-shadow 0.15s !important;
+    }
+    .stButton > button[kind="primary"]:hover,
+    button[data-testid="stFormSubmitButton"]:hover {
+        transform: scale(1.02) !important;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
+    }
+
+    /* Secondary buttons — subtle lift */
+    .stButton > button:not([kind="primary"]) {
+        transition: transform 0.15s, box-shadow 0.15s !important;
+    }
+    .stButton > button:not([kind="primary"]):hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Feature card hover — border glow */
+    .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        border-color: rgba(245, 158, 11, 0.4) !important;
+    }
+
+    /* Consistent spacing */
+    .gradient-divider { margin: 28px 0; }
+
     /* Existing signal badges — punchier */
     .deal-tag { color: #fff; background-color: #22c55e; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
     .buy-signal { color: #fff; background-color: #22c55e; padding: 2px 10px; border-radius: 4px; font-weight: bold; }
@@ -399,6 +493,7 @@ st.markdown("""
     .feature-card-drop { background: linear-gradient(135deg, #7c2d12, #dc2626); }
     .feature-card-packs { background: linear-gradient(135deg, #4c1d95, #7c3aed); }
     .feature-card-battles { background: linear-gradient(135deg, #064e3b, #059669); }
+    .feature-card-awards { background: linear-gradient(135deg, #854d0e, #ca8a04); }
 
     /* --- Game Night --- */
     .game-night-monster {
@@ -638,4 +733,4 @@ with _lf3:
         st.session_state.nav_target = "legal_disclosure"
         st.rerun()
 st.sidebar.caption("Card Shark earns affiliate commissions on some links. Not financial advice.")
-st.sidebar.caption("Card Shark v7.0")
+st.sidebar.caption("Card Shark v8.0")

@@ -4,6 +4,7 @@ import streamlit as st
 
 from config.pull_rates import PRODUCTS, FREE_PRODUCTS
 from modules.pack_simulator import rip_pack, rip_box, save_rip_result, get_rip_stats
+from modules.rip_battles import create_rip_challenge, accept_rip_battle, get_rip_hall_of_fame
 from modules.affiliates import ebay_search_affiliate_url, tcgplayer_search_affiliate_url
 from modules.ui_helpers import gradient_divider
 from tiers import is_pro, render_upgrade_banner, increment_and_check
@@ -138,6 +139,143 @@ def render():
     if not _user_is_pro:
         render_upgrade_banner("Pack Simulator", "unlimited packs, all products, box rips")
 
+    # --- Hall of Fame + Rip Battle Tabs ---
+    gradient_divider()
+    hof_tab, battle_tab = st.tabs(["Hall of Fame", "Rip Battle"])
+
+    with hof_tab:
+        st.markdown("### Pack Hall of Fame")
+        st.caption("The best rippers across all of Card Shark")
+        hof = get_rip_hall_of_fame()
+
+        medal_cols = st.columns(3)
+        with medal_cols[0]:
+            bp = hof["best_pull"]
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#854d0e,#ca8a04);border-radius:12px;'
+                f'padding:16px;text-align:center;">'
+                f'<div style="font-size:1.5em;">🥇</div>'
+                f'<strong>Best Single Pull</strong><br>'
+                f'<span style="font-size:1.3em;font-weight:900;">${bp["value"]:.2f}</span><br>'
+                f'<span style="color:#d1d5db;">{bp["player"]} ({bp["card_type"]})</span><br>'
+                f'<span style="color:#fbbf24;font-size:0.85em;">by {bp["user"]}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        with medal_cols[1]:
+            mp = hof["most_profitable"]
+            pl_str = f"${mp['pl']:+.2f}" if isinstance(mp["pl"], (int, float)) else "—"
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#065f46,#059669);border-radius:12px;'
+                f'padding:16px;text-align:center;">'
+                f'<div style="font-size:1.5em;">💰</div>'
+                f'<strong>Most Profitable</strong><br>'
+                f'<span style="font-size:1.3em;font-weight:900;">{pl_str}</span><br>'
+                f'<span style="color:#fbbf24;font-size:0.85em;">by {mp["user"]}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        with medal_cols[2]:
+            mpk = hof["most_packs"]
+            st.markdown(
+                f'<div style="background:linear-gradient(135deg,#1e3a5f,#1e40af);border-radius:12px;'
+                f'padding:16px;text-align:center;">'
+                f'<div style="font-size:1.5em;">🎰</div>'
+                f'<strong>Most Packs Ripped</strong><br>'
+                f'<span style="font-size:1.3em;font-weight:900;">{mpk["count"]}</span><br>'
+                f'<span style="color:#fbbf24;font-size:0.85em;">by {mpk["user"]}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+
+    with battle_tab:
+        st.markdown("### Rip Battle")
+        st.caption("Challenge a friend — both rip the same product, highest value wins!")
+
+        if not username:
+            st.warning("Log in to start a Rip Battle!")
+        else:
+            rb1, rb2 = st.columns(2)
+            with rb1:
+                st.markdown("**Create Challenge**")
+                rb_product = st.selectbox("Product", list(PRODUCTS.keys()), key="rb_product")
+                if st.button("Create Rip Challenge", key="rb_create", type="primary", use_container_width=True):
+                    code = create_rip_challenge(username, rb_product)
+                    st.session_state.rip_battle_code = code
+                    st.rerun()
+
+                if st.session_state.get("rip_battle_code"):
+                    code = st.session_state.rip_battle_code
+                    st.markdown(
+                        f'<div style="text-align:center;padding:16px;background:#1a1f2e;'
+                        f'border-radius:10px;margin:8px 0;">'
+                        f'<div style="font-size:2.5em;font-weight:900;letter-spacing:8px;'
+                        f'color:#f59e0b;">{code}</div>'
+                        f'<p style="color:#9ca3af;font-size:0.85em;">Share this code. Expires in 1 hour.</p>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+
+            with rb2:
+                st.markdown("**Join Challenge**")
+                rb_code = st.text_input("Battle Code", placeholder="e.g. ABC123", key="rb_join_code", max_chars=6)
+                if st.button("Rip Battle!", key="rb_join", use_container_width=True):
+                    if not rb_code or len(rb_code) < 6:
+                        st.error("Enter a 6-character code")
+                    else:
+                        with st.spinner("Ripping packs..."):
+                            result = accept_rip_battle(rb_code.upper(), username)
+                        if result:
+                            st.session_state.rip_battle_result = result
+                            st.rerun()
+                        else:
+                            st.error("Invalid or expired code.")
+
+            # Display result
+            rb_result = st.session_state.get("rip_battle_result")
+            if rb_result:
+                gradient_divider()
+                winner = rb_result["winner"]
+                is_tie = winner == "TIE"
+                user_won = winner == username
+
+                if is_tie:
+                    verdict = "IT'S A TIE!"
+                    color = "#facc15"
+                elif user_won:
+                    verdict = "YOU WIN!"
+                    color = "#22c55e"
+                else:
+                    verdict = "YOU LOSE!"
+                    color = "#ef4444"
+
+                st.markdown(
+                    f'<div style="text-align:center;font-size:2em;font-weight:900;color:{color};'
+                    f'margin:12px 0;">{verdict}</div>',
+                    unsafe_allow_html=True,
+                )
+
+                rc1, rc2, rc3 = st.columns([2, 1, 2])
+                with rc1:
+                    st.markdown(f"**{rb_result['user_a']}**")
+                    st.metric("Pack Value", f"${rb_result['total_value_a']:.2f}")
+                    bp_a = rb_result["best_pull_a"]
+                    st.caption(f"Best: {bp_a['player']} (${bp_a['value']:.2f})")
+                    st.caption(f"Hits: {rb_result['hits_a']}")
+                with rc2:
+                    st.markdown('<div style="text-align:center;font-size:1.5em;color:#6b7280;padding-top:30px;">VS</div>', unsafe_allow_html=True)
+                with rc3:
+                    st.markdown(f"**{rb_result['user_b']}**")
+                    st.metric("Pack Value", f"${rb_result['total_value_b']:.2f}")
+                    bp_b = rb_result["best_pull_b"]
+                    st.caption(f"Best: {bp_b['player']} (${bp_b['value']:.2f})")
+                    st.caption(f"Hits: {rb_result['hits_b']}")
+
+                if st.button("New Rip Battle", key="rb_new"):
+                    st.session_state.pop("rip_battle_result", None)
+                    st.session_state.pop("rip_battle_code", None)
+                    st.rerun()
+
 
 def _render_pack_results(cards: list[dict], product: dict, username: str | None):
     """Render the results of a single pack rip."""
@@ -166,8 +304,9 @@ def _render_pack_results(cards: list[dict], product: dict, username: str | None)
 
 
 def _render_card_row(card: dict, sport: str):
-    """Render a single card from the pack."""
+    """Render a single card from the pack with card image."""
     is_hit = card["is_hit"]
+    image_url = card.get("image_url", "")
 
     # Hit styling
     if is_hit:
@@ -177,7 +316,25 @@ def _render_card_row(card: dict, sport: str):
         border = ""
         bg = ""
 
-    c1, c2, c3, c4 = st.columns([3, 1.5, 1, 1.5])
+    # Image size: larger for hits
+    if is_hit and image_url:
+        img_size = "160px" if card["value"] >= 20 else "112px"
+        glow = "box-shadow:0 0 12px rgba(245,158,11,0.5);" if card["value"] >= 20 else ""
+    else:
+        img_size = "80px"
+        glow = ""
+
+    c0, c1, c2, c3, c4 = st.columns([0.8, 3, 1.5, 1, 1.5])
+
+    with c0:
+        if image_url:
+            st.markdown(
+                f'<img src="{image_url}" style="width:{img_size};height:auto;'
+                f'border-radius:6px;{glow}" />',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.write("")
 
     with c1:
         hit_tag = ' <span class="pack-hit">HIT</span>' if is_hit else ""
@@ -196,7 +353,7 @@ def _render_card_row(card: dict, sport: str):
             unsafe_allow_html=True,
         )
     with c3:
-        # Buy button
+        # Buy button — include card_type for more specific results
         if sport == "Pokemon":
             url = tcgplayer_search_affiliate_url(card["player_name"])
         else:

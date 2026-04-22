@@ -72,6 +72,9 @@ def add_card(
     variant: str | None = None,
     scan_source: str | None = None,
     scan_confidence: str | None = None,
+    grade_company: str | None = None,
+    grade_value: str | None = None,
+    image_url: str | None = None,
 ) -> dict:
     """Add a card to the portfolio. Returns the new card dict.
 
@@ -102,6 +105,12 @@ def add_card(
         new_card["scan_source"] = scan_source
     if scan_confidence is not None:
         new_card["scan_confidence"] = scan_confidence
+    if grade_company is not None:
+        new_card["grade_company"] = grade_company
+    if grade_value is not None:
+        new_card["grade_value"] = grade_value
+    if image_url is not None:
+        new_card["image_url"] = image_url
 
     cards.append(new_card)
     _save_portfolio(cards)

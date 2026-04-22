@@ -4,7 +4,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from urllib.parse import quote_plus
-from modules.ui_helpers import gradient_divider, score_progress_bar, supplies_button
+from modules.ui_helpers import gradient_divider, score_progress_bar, supplies_button, render_fuzzy_suggestions
 from modules.affiliates import supplies_affiliate_url, SUPPLIES_LINKS
 from modules.portfolio import add_card, remove_card, get_portfolio, bulk_import_cards
 from modules.collection_analytics import compute_collection_analytics, compute_portfolio_timeline, export_portfolio_csv
@@ -24,6 +24,23 @@ def render(current_user: str | None):
 
     if not current_user:
         st.warning("You're not logged in — your collection won't be saved between sessions. Sign up in the sidebar to keep it.")
+
+    # Fuzzy suggestion for the add card player name (outside form)
+    _pf_query = st.session_state.get("pf_player_input", "")
+    if _pf_query:
+        _pf_suggestion = render_fuzzy_suggestions(_pf_query, key_prefix="mc_fz")
+        if _pf_suggestion:
+            st.session_state["pf_player_input"] = _pf_suggestion
+            st.rerun()
+
+    _GRADE_COMPANIES = ["", "PSA", "BGS", "CGC", "SGC", "HGA"]
+    _GRADE_VALUES = {
+        "PSA": ["10", "9", "8", "7", "6", "5", "4", "3", "2", "1"],
+        "BGS": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
+        "CGC": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
+        "SGC": ["10", "9.5", "9", "8.5", "8", "7", "6", "5", "4"],
+        "HGA": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
+    }
 
     with st.form("add_card_form", clear_on_submit=True):
         st.markdown("**Add a Card**")
@@ -51,6 +68,15 @@ def render(current_user: str | None):
         with ac9:
             pf_qty = st.number_input("Quantity", min_value=1, value=1, step=1, key="pf_qty")
 
+        # Grade input
+        gc1, gc2 = st.columns(2)
+        with gc1:
+            pf_grade_company = st.selectbox("Grading Company", _GRADE_COMPANIES, key="pf_grade_co",
+                                            help="Leave blank for raw/ungraded cards")
+        with gc2:
+            _grade_opts = _GRADE_VALUES.get(pf_grade_company, [""]) if pf_grade_company else [""]
+            pf_grade_value = st.selectbox("Grade", _grade_opts, key="pf_grade_val") if pf_grade_company else ""
+
         pf_submit = st.form_submit_button("Add to Collection")
 
     if pf_submit and pf_player and pf_price > 0:
@@ -66,6 +92,8 @@ def render(current_user: str | None):
             year=pf_year or None,
             set_name=pf_set or None,
             card_number=pf_cardnum or None,
+            grade_company=pf_grade_company or None,
+            grade_value=pf_grade_value or None,
         )
         st.success(f"Added {pf_player} to your collection!")
         st.rerun()
@@ -235,15 +263,30 @@ def render(current_user: str | None):
             )
         return
 
-    # Fetch market values
-    if "portfolio_values" not in st.session_state:
-        st.session_state.portfolio_values = {}
-
-    pv_col1, pv_col2 = st.columns([3, 1])
-    with pv_col2:
+    # --- View Toggle & Filters ---
+    vt1, vt2, vt3 = st.columns([1, 1, 2])
+    with vt1:
+        view_mode = st.radio("View", ["List", "Grid"], horizontal=True, key="coll_view_mode")
+    with vt2:
         if st.button("Refresh Market Values", use_container_width=True):
             st.session_state.portfolio_values = {}
             st.rerun()
+
+    with st.expander("Filters"):
+        flt1, flt2, flt3, flt4 = st.columns(4)
+        with flt1:
+            _all_sports = sorted(set(c.get("sport", "") for c in portfolio))
+            flt_sports = st.multiselect("Sport", _all_sports, default=_all_sports, key="coll_flt_sport")
+        with flt2:
+            flt_condition = st.selectbox("Condition", ["All", "Graded", "Raw"], key="coll_flt_cond")
+        with flt3:
+            flt_min_val = st.number_input("Min Value ($)", min_value=0.0, value=0.0, step=5.0, key="coll_flt_min")
+        with flt4:
+            flt_sort = st.selectbox("Sort By", ["Name", "Value", "P&L %", "Date", "Sport"], key="coll_flt_sort")
+
+    # Fetch market values
+    if "portfolio_values" not in st.session_state:
+        st.session_state.portfolio_values = {}
 
     missing = [c for c in portfolio if c["id"] not in st.session_state.portfolio_values]
     if missing:
@@ -319,57 +362,152 @@ def render(current_user: str | None):
 
     gradient_divider()
 
-    # Card-by-card table
-    for card in portfolio:
-        current_val = st.session_state.portfolio_values.get(card["id"], 0)
-        qty = card.get("quantity", 1)
-        cost = card["purchase_price"] * qty
-        market_val = current_val * qty
-        pl = market_val - cost
-        pl_pct = (pl / cost * 100) if cost > 0 else 0
+    # --- Apply Filters ---
+    filtered_portfolio = portfolio
+    if flt_sports:
+        filtered_portfolio = [c for c in filtered_portfolio if c.get("sport", "") in flt_sports]
+    if flt_condition == "Graded":
+        filtered_portfolio = [c for c in filtered_portfolio if c.get("grade_company")]
+    elif flt_condition == "Raw":
+        filtered_portfolio = [c for c in filtered_portfolio if not c.get("grade_company")]
+    if flt_min_val > 0:
+        filtered_portfolio = [c for c in filtered_portfolio
+                              if st.session_state.portfolio_values.get(c["id"], 0) * c.get("quantity", 1) >= flt_min_val]
 
-        card_history = get_price_history(card["player_name"], card["sport"], card["card_type"], days=30)
-        spark_prices = [h["price"] for h in card_history[-14:]]
-        spark_svg = build_sparkline(spark_prices)
+    # Sort
+    def _sort_key(c):
+        mv = st.session_state.portfolio_values.get(c["id"], 0) * c.get("quantity", 1)
+        cost = c.get("purchase_price", 0) * c.get("quantity", 1)
+        pl_pct = ((mv - cost) / cost * 100) if cost > 0 else 0
+        if flt_sort == "Value":
+            return -mv
+        elif flt_sort == "P&L %":
+            return -pl_pct
+        elif flt_sort == "Date":
+            return c.get("purchase_date", "")
+        elif flt_sort == "Sport":
+            return c.get("sport", "")
+        return c.get("player_name", "").lower()
 
-        pc0, pc1, pc2, pc3, pc4, pc5, pc6, pc7, pc8 = st.columns([2.5, 0.8, 1, 1, 1, 1, 0.8, 0.7, 0.4])
-        with pc0:
-            st.write(f"**{card['player_name']}** ({card['card_type']}) • {card['sport']}")
-        with pc1:
-            if spark_svg:
-                st.markdown(spark_svg, unsafe_allow_html=True)
-        with pc2:
-            st.write(f"${cost:.2f}")
-        with pc3:
-            st.write(f"${market_val:.2f}")
-        with pc4:
-            css = "pl-positive" if pl >= 0 else "pl-negative"
-            st.markdown(f'<span class="{css}">${pl:+.2f}</span>', unsafe_allow_html=True)
-        with pc5:
-            css = "pl-positive" if pl_pct >= 0 else "pl-negative"
-            st.markdown(f'<span class="{css}">{pl_pct:+.1f}%</span>', unsafe_allow_html=True)
-        with pc6:
-            st.caption(card.get("purchase_date", ""))
-        with pc7:
-            sell_title_parts = [card["player_name"]]
-            if card.get("year"):
-                sell_title_parts.append(card["year"])
-            if card.get("set_name"):
-                sell_title_parts.append(card["set_name"])
-            if card.get("card_type") and card["card_type"] != "Any":
-                sell_title_parts.append(card["card_type"])
-            sell_title_parts.append(card["sport"])
-            sell_title_parts.append("Card")
-            sell_query = quote_plus(" ".join(sell_title_parts))
-            sell_url_raw = f"https://www.ebay.com/sell/create?title={sell_query}"
-            from modules.affiliates import affiliate_url as _aff_url
-            sell_url = _aff_url(sell_url_raw)
-            st.markdown(f'<a href="{sell_url}" target="_blank" class="ebay-btn" style="font-size:0.75em;padding:3px 10px;">Sell</a>', unsafe_allow_html=True)
-        with pc8:
-            if st.button("X", key=f"rm_pf_{card['id']}"):
-                remove_card(card["id"])
-                st.session_state.portfolio_values.pop(card["id"], None)
-                st.rerun()
+    filtered_portfolio = sorted(filtered_portfolio, key=_sort_key)
+
+    if len(filtered_portfolio) < len(portfolio):
+        st.caption(f"Showing {len(filtered_portfolio)} of {len(portfolio)} cards")
+
+    # --- Grid View ---
+    if view_mode == "Grid":
+        _SPORT_ICONS = {"NBA": "🏀", "NFL": "🏈", "MLB": "⚾", "Pokemon": "⚡"}
+        for row_start in range(0, len(filtered_portfolio), 3):
+            row_cards = filtered_portfolio[row_start:row_start + 3]
+            cols = st.columns(3)
+            for j, card in enumerate(row_cards):
+                current_val = st.session_state.portfolio_values.get(card["id"], 0)
+                qty = card.get("quantity", 1)
+                cost = card["purchase_price"] * qty
+                market_val = current_val * qty
+                pl = market_val - cost
+                pl_pct = (pl / cost * 100) if cost > 0 else 0
+                pl_color = "#22c55e" if pl >= 0 else "#ef4444"
+                pl_sign = "+" if pl >= 0 else ""
+
+                # Grade badge
+                grade_html = ""
+                if card.get("grade_company") and card.get("grade_value"):
+                    grade_html = (
+                        f'<span style="background:#3b82f6;color:#fff;padding:2px 6px;'
+                        f'border-radius:4px;font-size:0.75em;font-weight:bold;">'
+                        f'{card["grade_company"]} {card["grade_value"]}</span> '
+                    )
+
+                # Image or placeholder
+                img_url = card.get("image_url", "")
+                sport_icon = _SPORT_ICONS.get(card.get("sport", ""), "🃏")
+                if img_url:
+                    img_html = f'<img src="{img_url}" style="width:100%;height:160px;object-fit:cover;border-radius:8px 8px 0 0;" />'
+                else:
+                    img_html = (
+                        f'<div style="width:100%;height:160px;background:linear-gradient(135deg,#1a1f2e,#2d3748);'
+                        f'border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;'
+                        f'font-size:3em;">{sport_icon}</div>'
+                    )
+
+                with cols[j]:
+                    st.markdown(
+                        f'<div style="border:1px solid #3b4560;border-radius:12px;overflow:hidden;'
+                        f'transition:transform 0.2s,box-shadow 0.2s;margin-bottom:8px;">'
+                        f'{img_html}'
+                        f'<div style="padding:10px 12px;">'
+                        f'{grade_html}'
+                        f'<strong>{card["player_name"]}</strong><br>'
+                        f'<span style="color:#9ca3af;font-size:0.85em;">'
+                        f'{card.get("card_type", "Base")} &bull; {card.get("sport", "")}</span><br>'
+                        f'<span style="font-size:1.1em;font-weight:bold;">${market_val:.2f}</span> '
+                        f'<span style="color:{pl_color};font-size:0.85em;">'
+                        f'{pl_sign}${pl:.2f} ({pl_sign}{pl_pct:.1f}%)</span>'
+                        f'</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                    if st.button("Remove", key=f"grid_rm_{card['id']}"):
+                        remove_card(card["id"])
+                        st.session_state.portfolio_values.pop(card["id"], None)
+                        st.rerun()
+    else:
+        # --- List View (original) ---
+        for card in filtered_portfolio:
+            current_val = st.session_state.portfolio_values.get(card["id"], 0)
+            qty = card.get("quantity", 1)
+            cost = card["purchase_price"] * qty
+            market_val = current_val * qty
+            pl = market_val - cost
+            pl_pct = (pl / cost * 100) if cost > 0 else 0
+
+            # Grade badge for list view
+            grade_tag = ""
+            if card.get("grade_company") and card.get("grade_value"):
+                grade_tag = f" [{card['grade_company']} {card['grade_value']}]"
+
+            card_history = get_price_history(card["player_name"], card["sport"], card["card_type"], days=30)
+            spark_prices = [h["price"] for h in card_history[-14:]]
+            spark_svg = build_sparkline(spark_prices)
+
+            pc0, pc1, pc2, pc3, pc4, pc5, pc6, pc7, pc8 = st.columns([2.5, 0.8, 1, 1, 1, 1, 0.8, 0.7, 0.4])
+            with pc0:
+                st.write(f"**{card['player_name']}** ({card['card_type']}){grade_tag} • {card['sport']}")
+            with pc1:
+                if spark_svg:
+                    st.markdown(spark_svg, unsafe_allow_html=True)
+            with pc2:
+                st.write(f"${cost:.2f}")
+            with pc3:
+                st.write(f"${market_val:.2f}")
+            with pc4:
+                css = "pl-positive" if pl >= 0 else "pl-negative"
+                st.markdown(f'<span class="{css}">${pl:+.2f}</span>', unsafe_allow_html=True)
+            with pc5:
+                css = "pl-positive" if pl_pct >= 0 else "pl-negative"
+                st.markdown(f'<span class="{css}">{pl_pct:+.1f}%</span>', unsafe_allow_html=True)
+            with pc6:
+                st.caption(card.get("purchase_date", ""))
+            with pc7:
+                sell_title_parts = [card["player_name"]]
+                if card.get("year"):
+                    sell_title_parts.append(card["year"])
+                if card.get("set_name"):
+                    sell_title_parts.append(card["set_name"])
+                if card.get("card_type") and card["card_type"] != "Any":
+                    sell_title_parts.append(card["card_type"])
+                sell_title_parts.append(card["sport"])
+                sell_title_parts.append("Card")
+                sell_query = quote_plus(" ".join(sell_title_parts))
+                sell_url_raw = f"https://www.ebay.com/sell/create?title={sell_query}"
+                from modules.affiliates import affiliate_url as _aff_url
+                sell_url = _aff_url(sell_url_raw)
+                st.markdown(f'<a href="{sell_url}" target="_blank" class="ebay-btn" style="font-size:0.75em;padding:3px 10px;">Sell</a>', unsafe_allow_html=True)
+            with pc8:
+                if st.button("X", key=f"rm_pf_{card['id']}"):
+                    remove_card(card["id"])
+                    st.session_state.portfolio_values.pop(card["id"], None)
+                    st.rerun()
 
     # Collection Insights
     gradient_divider()

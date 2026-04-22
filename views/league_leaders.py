@@ -18,14 +18,8 @@ def render():
     st.title("League Leaders")
     st.caption("Top performers across MLB, NBA, and NFL — every row is a card to chase")
 
-    # --- Sport + Category selectors ---
-    col_sport, col_cat = st.columns([1, 2])
-    with col_sport:
-        sport = st.radio("Sport", ["MLB", "NBA", "NFL"], horizontal=True, key="ll_sport")
-    with col_cat:
-        categories = list(SPORT_CATEGORIES.get(sport, {}).keys())
-        default_idx = 0
-        category = st.selectbox("Stat Category", categories, index=default_idx, key="ll_cat")
+    # --- Sport selector ---
+    sport = st.radio("Sport", ["MLB", "NBA", "NFL"], horizontal=True, key="ll_sport")
 
     # --- Offseason banners ---
     if sport == "NBA" and is_nba_offseason():
@@ -38,13 +32,26 @@ def render():
         _, nfl_label = get_nfl_display_season()
         st.info(f"NFL offseason — showing **{nfl_label}** final leaders.")
 
-    gradient_divider()
-
-    # --- Tier limits ---
+    # --- Tabs: stat categories + Award Races ---
     _is_pro = is_pro()
+    stat_categories = list(SPORT_CATEGORIES.get(sport, {}).keys())
+    tab_names = stat_categories + ["Award Races"]
+    tabs = st.tabs(tab_names)
+
+    # Stat category tabs
+    for i, category in enumerate(stat_categories):
+        with tabs[i]:
+            _render_stat_leaders(sport, category, _is_pro)
+
+    # Award Races tab (last tab)
+    with tabs[-1]:
+        _render_award_odds(sport, _is_pro)
+
+
+def _render_stat_leaders(sport: str, category: str, _is_pro: bool):
+    """Render a stat leaders table for a given sport + category."""
     row_limit = 20 if _is_pro else 5
 
-    # --- Fetch data ---
     with st.spinner("Loading leaders..."):
         leaders = get_leaders(sport, category, limit=20)
 
@@ -59,9 +66,6 @@ def render():
     m3.metric("Players Shown", f"{min(len(leaders), row_limit)} of {len(leaders)}")
 
     gradient_divider()
-
-    # --- Leader table ---
-    st.markdown("### Leaderboard")
 
     # Header row
     h1, h2, h3, h4, h5 = st.columns([0.5, 2.5, 1.5, 1.5, 1.5])
@@ -98,23 +102,23 @@ def render():
         st.markdown('</div>', unsafe_allow_html=True)
         render_teaser_gate("League Leaders", "Unlock the full top 20 with Pro")
 
-    # --- Award Odds Section ---
-    _render_award_odds(sport, _is_pro)
-
 
 def _render_award_odds(sport: str, _is_pro: bool):
-    """Render the Award Odds section below the leaderboard."""
-    gradient_divider()
-
+    """Render the Award Odds section with podium-style display."""
     season_year = get_award_season(sport)
     odds_source = "FanDuel" if sport == "MLB" else "ESPN BET"
-    # NBA season spans two years (e.g. 2025-26)
     if sport == "NBA":
         season_label = f"{season_year - 1}-{str(season_year)[-2:]}"
     else:
         season_label = str(season_year)
-    st.markdown("### Award Odds")
-    st.caption(f"{season_label} season \u2022 Odds via {odds_source}")
+
+    st.markdown(
+        f'<div style="text-align:center;padding:10px 0;">'
+        f'<h2 style="margin-bottom:4px;">Award Races</h2>'
+        f'<span style="color:#9ca3af;">{season_label} season &bull; Odds via {odds_source}</span>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
 
     with st.spinner("Loading award odds..."):
         odds_data = get_award_odds(sport)
@@ -124,7 +128,6 @@ def _render_award_odds(sport: str, _is_pro: bool):
         return
 
     # Determine which awards to show based on tier
-    # Free = MVP only, Pro = MVP + ROY + Cy Young
     if sport == "MLB":
         mvp_awards = ["AL MVP", "NL MVP"]
         pro_awards = ["AL ROY", "NL ROY", "AL Cy Young", "NL Cy Young"]
@@ -135,47 +138,89 @@ def _render_award_odds(sport: str, _is_pro: bool):
         mvp_awards = ["MVP"]
         pro_awards = ["Offensive ROY", "Defensive ROY"]
 
-    # Always show MVP awards
-    _render_odds_columns(odds_data, mvp_awards, sport)
+    # Always show MVP awards with podium styling
+    _render_award_podium(odds_data, mvp_awards, sport)
 
     # Pro-only awards
     if _is_pro:
-        _render_odds_columns(odds_data, pro_awards, sport)
+        gradient_divider()
+        _render_award_podium(odds_data, pro_awards, sport)
     else:
-        # Show teaser for ROY / Cy Young
+        gradient_divider()
         pro_label = "ROY & Cy Young" if sport == "MLB" else "Rookie of the Year"
         render_upgrade_banner("Award Odds", f"{pro_label} odds")
 
 
-def _render_odds_columns(odds_data: dict, award_names: list[str], sport: str):
-    """Render award odds in two-column layout."""
-    # Filter to awards that have data
+def _render_award_podium(odds_data: dict, award_names: list[str], sport: str):
+    """Render award odds with podium-style top 3 cards."""
     active = [(name, odds_data.get(name, [])) for name in award_names]
 
-    # Render in rows of 2
     for i in range(0, len(active), 2):
         pair = active[i:i + 2]
         cols = st.columns(len(pair))
         for col, (award_name, entries) in zip(cols, pair):
             with col:
-                st.markdown(f"**{award_name}**")
+                st.markdown(
+                    f'<div style="text-align:center;padding:8px 0;">'
+                    f'<h3 style="margin-bottom:8px;">{award_name}</h3></div>',
+                    unsafe_allow_html=True,
+                )
                 if not entries:
                     st.caption("Not yet available")
                     continue
-                for entry in entries:
+
+                # Podium top 3
+                medal_icons = ["🥇", "🥈", "🥉"]
+                medal_gradients = [
+                    "linear-gradient(135deg,#854d0e,#ca8a04)",
+                    "linear-gradient(135deg,#4b5563,#9ca3af)",
+                    "linear-gradient(135deg,#7c2d12,#c2410c)",
+                ]
+                for j, entry in enumerate(entries[:3]):
                     player = entry["player"]
                     team = f" ({entry['team']})" if entry.get("team") else ""
-                    odds = entry["odds"]
-                    # Format odds with + prefix if positive number
-                    if odds and not str(odds).startswith("-") and not str(odds).startswith("+"):
-                        try:
-                            float(odds)
-                            odds = f"+{odds}"
-                        except ValueError:
-                            pass
+                    odds = _format_odds(entry["odds"])
                     buy_url = ebay_search_affiliate_url(player, sport)
+                    icon = medal_icons[j] if j < 3 else ""
+                    bg = medal_gradients[j] if j < 3 else "linear-gradient(135deg,#1a1f2e,#2d3748)"
+                    font_size = "1.1em" if j == 0 else "1em"
                     st.markdown(
-                        f'#{entry["rank"]} {player}{team} \u2014 {odds} &nbsp; '
-                        f'<a href="{buy_url}" target="_blank" class="ebay-btn">Buy Cards</a>',
+                        f'<div style="background:{bg};border-radius:10px;padding:12px 16px;'
+                        f'margin:6px 0;display:flex;justify-content:space-between;align-items:center;">'
+                        f'<div>'
+                        f'<span style="font-size:1.2em;">{icon}</span> '
+                        f'<strong style="font-size:{font_size};">{player}</strong>'
+                        f'<span style="color:#d1d5db;">{team}</span>'
+                        f'</div>'
+                        f'<div style="display:flex;align-items:center;gap:10px;">'
+                        f'<span style="font-weight:bold;font-size:1.1em;">{odds}</span>'
+                        f'<a href="{buy_url}" target="_blank" class="ebay-btn" '
+                        f'style="font-size:0.75em;padding:3px 10px;">Buy Cards</a>'
+                        f'</div></div>',
                         unsafe_allow_html=True,
                     )
+
+                # Remaining entries (4-5) in simpler format
+                for entry in entries[3:]:
+                    player = entry["player"]
+                    team = f" ({entry['team']})" if entry.get("team") else ""
+                    odds = _format_odds(entry["odds"])
+                    buy_url = ebay_search_affiliate_url(player, sport)
+                    st.markdown(
+                        f'<div style="padding:6px 16px;margin:2px 0;">'
+                        f'#{entry["rank"]} {player}{team} — {odds} &nbsp; '
+                        f'<a href="{buy_url}" target="_blank" class="ebay-btn" '
+                        f'style="font-size:0.7em;padding:2px 8px;">Buy</a></div>',
+                        unsafe_allow_html=True,
+                    )
+
+
+def _format_odds(odds) -> str:
+    """Format odds with + prefix if positive."""
+    if odds and not str(odds).startswith("-") and not str(odds).startswith("+"):
+        try:
+            float(odds)
+            return f"+{odds}"
+        except ValueError:
+            pass
+    return str(odds)
