@@ -192,6 +192,44 @@ def bulk_import_cards(card_dicts: list[dict], max_allowed: int | None = None) ->
     return {"imported": imported, "skipped": skipped, "limit_hit": limit_hit}
 
 
+def find_duplicate(player_name: str, year: str | None, card_number: str | None, sport: str) -> dict | None:
+    """Check if a card already exists in the portfolio.
+
+    Matches on player_name (case-insensitive) + sport + year + card_number.
+    Returns the existing card dict if found, else None.
+    """
+    cards = _load_portfolio()
+    pn = player_name.strip().lower()
+    for card in cards:
+        if card.get("player_name", "").strip().lower() != pn:
+            continue
+        if card.get("sport", "") != sport:
+            continue
+        # Year must match (both None or both equal)
+        card_year = card.get("year") or None
+        check_year = year or None
+        if card_year != check_year:
+            continue
+        # Card number must match
+        card_num = card.get("card_number") or None
+        check_num = card_number or None
+        if card_num != check_num:
+            continue
+        return card
+    return None
+
+
+def increment_quantity(card_id: str, amount: int = 1) -> bool:
+    """Increase a card's quantity by the given amount. Returns True if found."""
+    cards = _load_portfolio()
+    for card in cards:
+        if card["id"] == card_id:
+            card["quantity"] = card.get("quantity", 1) + amount
+            _save_portfolio(cards)
+            return True
+    return False
+
+
 def get_portfolio() -> list[dict]:
     """Return all cards in the portfolio."""
     return _load_portfolio()

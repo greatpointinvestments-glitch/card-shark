@@ -4,9 +4,12 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from urllib.parse import quote_plus
-from modules.ui_helpers import gradient_divider, score_progress_bar, supplies_button, render_fuzzy_suggestions
+from modules.ui_helpers import gradient_divider, score_progress_bar, supplies_button, render_fuzzy_suggestions, card_thumbnail, market_signal_badge
 from modules.affiliates import supplies_affiliate_url, SUPPLIES_LINKS
-from modules.portfolio import add_card, remove_card, update_card_image, get_portfolio, bulk_import_cards
+from modules.ebay_search import search_ebay_cards
+from modules.pokemon_tcg import search_pokemon_cards
+from modules.listing_quality import extract_parallel, extract_grade, is_graded
+from modules.portfolio import add_card, remove_card, update_card_image, get_portfolio, bulk_import_cards, find_duplicate, increment_quantity
 from modules.collection_analytics import compute_collection_analytics, compute_portfolio_timeline, export_portfolio_csv
 from modules.trade_analyzer import get_card_market_value
 from modules.card_types import get_card_type_options
@@ -25,78 +28,355 @@ def render(current_user: str | None):
     if not current_user:
         st.warning("You're not logged in — your collection won't be saved between sessions. Sign up in the sidebar to keep it.")
 
-    # Fuzzy suggestion for the add card player name (outside form)
-    _pf_query = st.session_state.get("pf_player_input", "")
-    if _pf_query:
-        _pf_suggestion = render_fuzzy_suggestions(_pf_query, key_prefix="mc_fz")
-        if _pf_suggestion:
-            st.session_state["pf_player_input"] = _pf_suggestion
+    _GRADE_COMPANIES = ["PSA", "BGS", "CGC", "SGC", "HGA"]
+
+    # --- "Add another from set" pre-fill ---
+    _prefill_year = st.session_state.pop("search_prefill_year", "")
+    _prefill_set = st.session_state.pop("search_prefill_set", "")
+    _prefill_sport = st.session_state.pop("search_prefill_sport", "NBA")
+    _prefill_player = st.session_state.pop("search_prefill_player", "")
+
+    # Scanner pre-fill
+    if st.session_state.get("scanner_to_collection"):
+        scan_data = st.session_state.pop("scanner_to_collection")
+        _prefill_player = scan_data.get("player_name", "")
+        _prefill_year = scan_data.get("year", "")
+        _prefill_sport = scan_data.get("sport", "NBA")
+        st.session_state["search_auto_trigger"] = True
+
+    # --- Search to Add ---
+    st.markdown("**Add a Card**")
+    sb1, sb2, sb3, sb4 = st.columns([3, 1.5, 1, 2])
+    with sb1:
+        search_player = st.text_input("Player Name", value=_prefill_player, placeholder="e.g. Victor Wembanyama", key="search_add_player")
+    with sb2:
+        search_year = st.text_input("Year (optional)", value=_prefill_year, placeholder="e.g. 2023-24", key="search_add_year")
+    with sb3:
+        search_cardnum = st.text_input("Card # (optional)", placeholder="e.g. 275", key="search_add_cardnum")
+    with sb4:
+        _sport_opts = ["NBA", "NFL", "MLB", "Pokemon"]
+        _sport_idx = _sport_opts.index(_prefill_sport) if _prefill_sport in _sport_opts else 0
+        search_sport = st.radio("Sport", _sport_opts, index=_sport_idx, horizontal=True, key="search_add_sport")
+
+    # Fuzzy suggestion
+    if search_player:
+        _fz_suggestion = render_fuzzy_suggestions(search_player, search_sport, key_prefix="mc_search_fz")
+        if _fz_suggestion:
+            st.session_state["search_add_player"] = _fz_suggestion
             st.rerun()
 
-    _GRADE_COMPANIES = ["", "PSA", "BGS", "CGC", "SGC", "HGA"]
-    _GRADE_VALUES = {
-        "PSA": ["10", "9", "8", "7", "6", "5", "4", "3", "2", "1"],
-        "BGS": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
-        "CGC": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
-        "SGC": ["10", "9.5", "9", "8.5", "8", "7", "6", "5", "4"],
-        "HGA": ["10", "9.5", "9", "8.5", "8", "7.5", "7", "6.5", "6"],
-    }
+    search_clicked = st.button("Search Cards", type="primary", use_container_width=True)
+    auto_trigger = st.session_state.pop("search_auto_trigger", False)
 
-    with st.form("add_card_form", clear_on_submit=True):
-        st.markdown("**Add a Card**")
-        ac1, ac2, ac3 = st.columns(3)
-        with ac1:
-            pf_player = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama")
-        with ac2:
-            pf_sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="pf_sport")
-        with ac3:
-            pf_type = st.selectbox("Card Type", get_card_type_options(), key="pf_type")
+    if search_clicked or auto_trigger:
+        if not search_player:
+            st.warning("Enter a player name to search.")
+        else:
+            with st.spinner("Searching for matching cards..."):
+                if search_sport == "Pokemon":
+                    raw_results = search_pokemon_cards(search_player, set_name=_prefill_set or None, limit=30)
+                    # Normalize Pokemon results to common format
+                    results = []
+                    for p in raw_results:
+                        results.append({
+                            "title": f"{p['name']} - {p['set_name']} #{p['number']}",
+                            "price": p.get("market_price", 0),
+                            "image_url": p.get("image_small", ""),
+                            "set_name": p.get("set_name", ""),
+                            "card_number": p.get("number", ""),
+                            "year": p.get("set_release_date", "")[:4] if p.get("set_release_date") else "",
+                            "variant": p.get("rarity", "Base"),
+                            "sport": "Pokemon",
+                            "player_name": p.get("name", search_player),
+                        })
+                else:
+                    query = search_player
+                    if search_year:
+                        query = f"{search_year} {query}"
+                    raw_results = search_ebay_cards(query, search_sport, "Any", year=search_year or None, limit=30)
+                    results = []
+                    for r in raw_results:
+                        variant = extract_parallel(r["title"])
+                        grade_info = extract_grade(r["title"])
+                        results.append({
+                            "title": r["title"],
+                            "price": r.get("total", r.get("price", 0)),
+                            "image_url": r.get("image_url", ""),
+                            "set_name": _prefill_set or "",
+                            "card_number": search_cardnum or "",
+                            "year": search_year or "",
+                            "variant": variant,
+                            "grade_detected": grade_info,
+                            "sport": search_sport,
+                            "player_name": search_player,
+                            "ebay_url": r.get("url", ""),
+                        })
 
-        ac4, ac5, ac6 = st.columns(3)
-        with ac4:
-            pf_year = st.text_input("Year", placeholder="e.g. 2023-24", key="pf_year")
-        with ac5:
-            pf_set = st.text_input("Set", placeholder="e.g. Prizm", key="pf_set")
-        with ac6:
-            pf_cardnum = st.text_input("Card #", placeholder="e.g. 275", key="pf_cardnum")
+            # Filter by card number if provided
+            if search_cardnum:
+                filtered = [r for r in results if search_cardnum in r.get("title", "")]
+                if filtered:
+                    results = filtered
 
-        ac7, ac8, ac9 = st.columns(3)
-        with ac7:
-            pf_price = st.number_input("Purchase Price ($)", min_value=0.0, step=1.0, key="pf_price")
-        with ac8:
-            pf_date = st.date_input("Purchase Date", key="pf_date")
-        with ac9:
-            pf_qty = st.number_input("Quantity", min_value=1, value=1, step=1, key="pf_qty")
+            st.session_state["search_add_results"] = results
+            st.session_state["search_add_meta"] = {
+                "player": search_player, "year": search_year,
+                "sport": search_sport, "set": _prefill_set,
+            }
 
-        # Grade input
-        gc1, gc2 = st.columns(2)
-        with gc1:
-            pf_grade_company = st.selectbox("Grading Company", _GRADE_COMPANIES, key="pf_grade_co",
-                                            help="Leave blank for raw/ungraded cards")
-        with gc2:
-            pf_grade_value = st.text_input("Grade", placeholder="e.g. 10, 9.5, 9", key="pf_grade_val",
-                                           help="PSA: 1-10 | BGS/CGC/SGC: 1-10 with half grades")
+    # --- Display search results ---
+    results = st.session_state.get("search_add_results", [])
+    if results:
+        st.markdown(f"**Found {len(results)} cards** — click one to add it")
+        for row_start in range(0, min(len(results), 12), 3):
+            row = results[row_start:row_start + 3]
+            cols = st.columns(3)
+            for j, card_result in enumerate(row):
+                with cols[j]:
+                    # Thumbnail
+                    img_url = card_result.get("image_url", "")
+                    if img_url:
+                        st.markdown(card_thumbnail(img_url), unsafe_allow_html=True)
 
-        pf_submit = st.form_submit_button("Add to Collection")
+                    # Title (truncated)
+                    title = card_result.get("title", "")
+                    display_title = title[:60] + "..." if len(title) > 60 else title
+                    st.markdown(f"**{display_title}**")
 
-    if pf_submit and pf_player and pf_price > 0:
-        if not is_pro():
-            from config.settings import FREE_TIER_LIMITS
-            current_count = len(get_portfolio())
-            max_cards = FREE_TIER_LIMITS.get("portfolio_max_cards", 25)
-            if current_count >= max_cards:
-                st.error(f"Free accounts can hold {max_cards} cards. Upgrade to Pro for unlimited.")
-                st.stop()
-        add_card(
-            pf_player, pf_sport, pf_type, pf_price, str(pf_date), pf_qty,
-            year=pf_year or None,
-            set_name=pf_set or None,
-            card_number=pf_cardnum or None,
-            grade_company=pf_grade_company or None,
-            grade_value=pf_grade_value or None,
-        )
-        st.success(f"Added {pf_player} to your collection!")
-        st.rerun()
+                    # Badges
+                    badges = ""
+                    variant = card_result.get("variant", "base")
+                    if variant and variant != "base":
+                        badges += f'<span style="background:#7c3aed;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75em;margin-right:4px;">{variant.replace("_", " ").title()}</span>'
+                    grade_det = card_result.get("grade_detected")
+                    if grade_det:
+                        badges += f'<span style="background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75em;">{grade_det}</span>'
+                    if badges:
+                        st.markdown(badges, unsafe_allow_html=True)
+
+                    price = card_result.get("price", 0)
+                    if price > 0:
+                        st.caption(f"${price:.2f}")
+
+                    if st.button("Add This Card", key=f"add_result_{row_start + j}", use_container_width=True):
+                        st.session_state["confirm_add_card"] = card_result
+                        st.rerun()
+
+        if len(results) > 12:
+            st.caption(f"Showing 12 of {len(results)} results")
+
+    # --- Confirmation Panel ---
+    confirm_card = st.session_state.get("confirm_add_card")
+    if confirm_card:
+        st.markdown("---")
+        st.markdown("### Confirm & Add to Collection")
+
+        cf1, cf2 = st.columns([1, 2])
+        with cf1:
+            img = confirm_card.get("image_url", "")
+            if img:
+                st.markdown(card_thumbnail(img), unsafe_allow_html=True)
+        with cf2:
+            st.markdown(f"**{confirm_card.get('title', '')}**")
+            variant = confirm_card.get("variant", "base")
+            if variant and variant != "base":
+                st.caption(f"Variant: {variant.replace('_', ' ').title()}")
+
+        # Auto-populated fields
+        cp1, cp2, cp3 = st.columns(3)
+        with cp1:
+            conf_player = st.text_input("Player", value=confirm_card.get("player_name", ""), key="conf_player")
+        with cp2:
+            conf_year = st.text_input("Year", value=confirm_card.get("year", ""), key="conf_year")
+        with cp3:
+            conf_cardnum = st.text_input("Card #", value=confirm_card.get("card_number", ""), key="conf_cardnum")
+
+        cp4, cp5 = st.columns(2)
+        with cp4:
+            conf_set = st.text_input("Set", value=confirm_card.get("set_name", ""), key="conf_set")
+        with cp5:
+            conf_variant = st.text_input("Variant", value=variant.replace("_", " ").title() if variant != "base" else "Base", key="conf_variant")
+
+        # Raw / Graded toggle
+        grade_det = confirm_card.get("grade_detected")
+        default_graded = grade_det is not None
+        conf_condition = st.radio("Condition", ["Raw", "Graded"], index=1 if default_graded else 0, horizontal=True, key="conf_condition")
+
+        conf_grade_co = None
+        conf_grade_val = None
+        if conf_condition == "Graded":
+            gc1, gc2 = st.columns(2)
+            with gc1:
+                # Try to pre-fill from detected grade
+                default_co_idx = 0
+                if grade_det:
+                    for i, co in enumerate(_GRADE_COMPANIES):
+                        if co.lower() in grade_det.lower():
+                            default_co_idx = i
+                            break
+                conf_grade_co = st.selectbox("Grading Company", _GRADE_COMPANIES, index=default_co_idx, key="conf_grade_co")
+            with gc2:
+                default_grade = ""
+                if grade_det:
+                    import re
+                    _gm = re.search(r'(\d+\.?\d*)', grade_det)
+                    if _gm:
+                        default_grade = _gm.group(1)
+                conf_grade_val = st.text_input("Grade", value=default_grade, placeholder="e.g. 10, 9.5", key="conf_grade_val")
+
+        # Purchase price — pre-fill with market avg_sold
+        _prefill_price = confirm_card.get("price", 0)
+        # Try to get actual sold price
+        if conf_player:
+            _market_key = f"_market_{conf_player}_{confirm_card.get('sport', '')}"
+            if _market_key not in st.session_state:
+                with st.spinner("Looking up sold prices..."):
+                    _mkt = get_card_market_value(
+                        conf_player, confirm_card.get("sport", "NBA"), conf_variant or "Base",
+                        year=conf_year or None, set_name=conf_set or None,
+                    )
+                    st.session_state[_market_key] = _mkt
+            else:
+                _mkt = st.session_state[_market_key]
+
+            if _mkt.get("avg_sold", 0) > 0:
+                _prefill_price = _mkt["avg_sold"]
+                st.markdown(market_signal_badge(_mkt.get("market_signal", "N/A")), unsafe_allow_html=True)
+                st.caption(f"Pre-filled with avg sold price (${_mkt['avg_sold']:.2f})")
+
+        pp1, pp2 = st.columns(2)
+        with pp1:
+            conf_price = st.number_input("Purchase Price ($)", min_value=0.0, value=round(_prefill_price, 2), step=1.0, key="conf_price")
+        with pp2:
+            conf_date = st.date_input("Purchase Date", key="conf_date")
+
+        # Duplicate check
+        _dup = find_duplicate(conf_player, conf_year or None, conf_cardnum or None, confirm_card.get("sport", "NBA"))
+        if _dup:
+            st.warning(f"You already have this card (qty: {_dup.get('quantity', 1)}). Increase quantity instead?")
+            dc1, dc2 = st.columns(2)
+            with dc1:
+                if st.button("Yes, increase quantity", key="dup_inc", use_container_width=True):
+                    increment_quantity(_dup["id"])
+                    st.success(f"Increased {conf_player} quantity to {_dup.get('quantity', 1) + 1}!")
+                    st.session_state.pop("confirm_add_card", None)
+                    st.session_state.pop("search_add_results", None)
+                    st.rerun()
+            with dc2:
+                if st.button("No, add as new card", key="dup_new", use_container_width=True):
+                    st.session_state["force_add_new"] = True
+                    st.rerun()
+
+        # Confirm & Add button
+        can_add = not _dup or st.session_state.pop("force_add_new", False)
+        if can_add:
+            if st.button("Confirm & Add", type="primary", use_container_width=True, key="confirm_add_btn"):
+                if not conf_player:
+                    st.warning("Player name is required.")
+                else:
+                    if not is_pro():
+                        from config.settings import FREE_TIER_LIMITS
+                        current_count = len(get_portfolio())
+                        max_cards = FREE_TIER_LIMITS.get("portfolio_max_cards", 25)
+                        if current_count >= max_cards:
+                            st.error(f"Free accounts can hold {max_cards} cards. Upgrade to Pro for unlimited.")
+                            st.stop()
+
+                    add_card(
+                        conf_player,
+                        confirm_card.get("sport", "NBA"),
+                        conf_variant or "Base",
+                        conf_price,
+                        str(conf_date),
+                        1,
+                        year=conf_year or None,
+                        set_name=conf_set or None,
+                        card_number=conf_cardnum or None,
+                        variant=conf_variant or None,
+                        grade_company=conf_grade_co,
+                        grade_value=conf_grade_val,
+                        image_url=confirm_card.get("image_url") or None,
+                    )
+                    st.success(f"Added {conf_player} to your collection!")
+                    # Set up "Add another from this set" shortcut
+                    if conf_set:
+                        st.session_state["last_added_set"] = conf_set
+                        st.session_state["last_added_year"] = conf_year
+                        st.session_state["last_added_sport"] = confirm_card.get("sport", "NBA")
+                    st.session_state.pop("confirm_add_card", None)
+                    st.session_state.pop("search_add_results", None)
+                    st.rerun()
+
+        if st.button("Cancel", key="cancel_confirm"):
+            st.session_state.pop("confirm_add_card", None)
+            st.rerun()
+
+    # --- "Add another from this set" shortcut ---
+    _last_set = st.session_state.pop("last_added_set", None)
+    _last_year = st.session_state.pop("last_added_year", None)
+    _last_sport = st.session_state.pop("last_added_sport", None)
+    if _last_set:
+        if st.button(f"Add another from {_last_set}", key="add_another_set", use_container_width=True):
+            st.session_state["search_prefill_year"] = _last_year or ""
+            st.session_state["search_prefill_set"] = _last_set
+            st.session_state["search_prefill_sport"] = _last_sport or "NBA"
+            st.rerun()
+
+    # --- Manual add fallback ---
+    with st.expander("Can't find your card? Add manually"):
+        with st.form("manual_add_card_form", clear_on_submit=True):
+            ac1, ac2, ac3 = st.columns(3)
+            with ac1:
+                pf_player = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama", key="manual_player")
+            with ac2:
+                pf_sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="manual_sport")
+            with ac3:
+                pf_type = st.selectbox("Card Type", get_card_type_options(), key="manual_type")
+
+            ac4, ac5, ac6 = st.columns(3)
+            with ac4:
+                pf_year = st.text_input("Year", placeholder="e.g. 2023-24", key="manual_year")
+            with ac5:
+                pf_set = st.text_input("Set", placeholder="e.g. Prizm", key="manual_set")
+            with ac6:
+                pf_cardnum = st.text_input("Card #", placeholder="e.g. 275", key="manual_cardnum")
+
+            ac7, ac8, ac9 = st.columns(3)
+            with ac7:
+                pf_price = st.number_input("Purchase Price ($)", min_value=0.0, step=1.0, key="manual_price")
+            with ac8:
+                pf_date = st.date_input("Purchase Date", key="manual_date")
+            with ac9:
+                pf_qty = st.number_input("Quantity", min_value=1, value=1, step=1, key="manual_qty")
+
+            gc1, gc2 = st.columns(2)
+            with gc1:
+                pf_grade_company = st.selectbox("Grading Company", [""] + _GRADE_COMPANIES, key="manual_grade_co",
+                                                help="Leave blank for raw/ungraded cards")
+            with gc2:
+                pf_grade_value = st.text_input("Grade", placeholder="e.g. 10, 9.5, 9", key="manual_grade_val",
+                                               help="PSA: 1-10 | BGS/CGC/SGC: 1-10 with half grades")
+
+            pf_submit = st.form_submit_button("Add to Collection")
+
+        if pf_submit and pf_player and pf_price > 0:
+            if not is_pro():
+                from config.settings import FREE_TIER_LIMITS
+                current_count = len(get_portfolio())
+                max_cards = FREE_TIER_LIMITS.get("portfolio_max_cards", 25)
+                if current_count >= max_cards:
+                    st.error(f"Free accounts can hold {max_cards} cards. Upgrade to Pro for unlimited.")
+                    st.stop()
+            add_card(
+                pf_player, pf_sport, pf_type, pf_price, str(pf_date), pf_qty,
+                year=pf_year or None,
+                set_name=pf_set or None,
+                card_number=pf_cardnum or None,
+                grade_company=pf_grade_company or None,
+                grade_value=pf_grade_value or None,
+            )
+            st.success(f"Added {pf_player} to your collection!")
+            st.rerun()
 
     # --- CSV Import Section ---
     with st.expander("Import Collection (CSV)"):

@@ -2,10 +2,9 @@
 
 import streamlit as st
 
-from modules.card_scanner import smart_scan, build_collection_entry_from_scan
-from modules.portfolio import add_card
+from modules.card_scanner import smart_scan
 from modules.trade_analyzer import get_card_market_value
-from modules.ui_helpers import gradient_divider, whatnot_button, topps_button, drip_shop_button, ebay_button, market_signal_badge, render_fuzzy_suggestions
+from modules.ui_helpers import gradient_divider, whatnot_button, topps_button, drip_shop_button, ebay_button, market_signal_badge
 from modules.affiliates import (
     ebay_search_affiliate_url, whatnot_search_affiliate_url,
     topps_search_affiliate_url, drip_shop_search_affiliate_url,
@@ -138,78 +137,15 @@ def render():
                 )
 
             gradient_divider()
-            st.markdown("#### Confirm & Add to Collection")
-            st.caption("Edit any fields below before adding to your collection")
+            st.markdown("#### Add to Collection")
+            st.caption("Search for this card in the marketplace and add it with real images and pricing")
 
-            # Fuzzy suggestion for scanned player name
-            _scanned_name = result.get("player_name", "")
-            if _scanned_name:
-                _scan_suggestion = render_fuzzy_suggestions(_scanned_name, result.get("sport"), key_prefix="sc_fz")
-                if _scan_suggestion:
-                    result["player_name"] = _scan_suggestion
-                    st.rerun()
-
-            with st.form("scanner_add_form", clear_on_submit=True):
-                sc1, sc2, sc3 = st.columns(3)
-                with sc1:
-                    scan_player = st.text_input("Player Name", value=result.get("player_name") or "")
-                with sc2:
-                    _sport_options = ["NBA", "NFL", "MLB", "Pokemon"]
-                    _detected_sport = result.get("sport", "NBA")
-                    _sport_idx = _sport_options.index(_detected_sport) if _detected_sport in _sport_options else 0
-                    scan_sport = st.selectbox("Sport", _sport_options, index=_sport_idx)
-                with sc3:
-                    scan_year = st.text_input("Year", value=result.get("year") or "")
-
-                sc4, sc5, sc6 = st.columns(3)
-                with sc4:
-                    scan_set = st.text_input("Set Name", value=result.get("set_name") or "")
-                with sc5:
-                    scan_variant = st.text_input("Variant", value=result.get("variant") or "Base")
-                with sc6:
-                    scan_card_num = st.text_input("Card #", value=result.get("card_number") or "")
-
-                sc7, sc8 = st.columns(2)
-                with sc7:
-                    scan_price = st.number_input("Purchase Price ($)", min_value=0.0, value=round(_suggested_price, 2), step=1.0, key="scan_price")
-                with sc8:
-                    scan_date = st.date_input("Purchase Date", key="scan_date")
-
-                scan_submit = st.form_submit_button("Add to Collection", use_container_width=True)
-
-            if scan_submit and not scan_player:
-                st.warning("Player name is required to add to collection.")
-
-            if scan_submit and scan_player:
-                if not pro:
-                    from config.settings import FREE_TIER_LIMITS
-                    from modules.portfolio import get_portfolio
-                    current_count = len(get_portfolio())
-                    max_cards = FREE_TIER_LIMITS.get("portfolio_max_cards", 25)
-                    if current_count >= max_cards:
-                        st.error(f"Free accounts can hold {max_cards} cards. Upgrade to Pro for unlimited.")
-                        st.stop()
-
-                entry = build_collection_entry_from_scan(result, scan_price, str(scan_date))
-                entry["player_name"] = scan_player
-                entry["sport"] = scan_sport
-                entry["year"] = scan_year
-                entry["set_name"] = scan_set
-                entry["variant"] = scan_variant
-                entry["card_number"] = scan_card_num
-
-                add_card(
-                    player_name=entry["player_name"],
-                    sport=entry["sport"],
-                    card_type=entry["card_type"],
-                    purchase_price=entry["purchase_price"],
-                    purchase_date=entry["purchase_date"],
-                    quantity=entry["quantity"],
-                    year=entry.get("year"),
-                    set_name=entry.get("set_name"),
-                    card_number=entry.get("card_number"),
-                    variant=entry.get("variant"),
-                    scan_source=entry.get("scan_source"),
-                    scan_confidence=entry.get("scan_confidence"),
-                )
-                st.success(f"Added {scan_player} to your collection!")
+            if st.button("Find This Card in My Collection", type="primary", use_container_width=True, key="scanner_to_collection"):
+                st.session_state["scanner_to_collection"] = {
+                    "player_name": result.get("player_name", ""),
+                    "year": result.get("year", ""),
+                    "card_number": result.get("card_number", ""),
+                    "sport": result.get("sport", "NBA"),
+                }
+                st.session_state.nav_target = "📁 My Collection"
+                st.rerun()
