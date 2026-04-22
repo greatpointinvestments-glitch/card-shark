@@ -225,8 +225,8 @@ def render_listing_row(listing: dict, show_player: bool = False):
 
 
 def render_listing_compact(listing: dict):
-    """Render a compact 4-column listing row (thumb, title, total, button)."""
-    c0, c1, c2, c3 = st.columns([0.5, 3, 1, 1])
+    """Render a compact listing row (thumb, title, price+shipping, total, button)."""
+    c0, c1, c2, c3 = st.columns([0.5, 3, 1.2, 1])
     title = listing["title"]
     url = listing["url"]
     vs = listing.get("vs_median", 0)
@@ -236,6 +236,8 @@ def render_listing_compact(listing: dict):
     with c1:
         st.markdown(ebay_link(title, url, max_chars=65, vs_median=vs, buying_format=fmt), unsafe_allow_html=True)
     with c2:
+        ship = listing.get("shipping", 0)
+        ship_text = f"+${ship:.2f} ship" if ship > 0 else "Free ship"
         if fmt == "Auction":
             bids = listing.get("bid_count", 0)
             if bids == 0:
@@ -249,6 +251,7 @@ def render_listing_compact(listing: dict):
         else:
             badge = deal_score_badge(vs)
             st.markdown(f"${listing['total']:.2f} {badge}", unsafe_allow_html=True)
+        st.caption(ship_text)
     with c3:
         st.markdown(ebay_button(url), unsafe_allow_html=True)
 
