@@ -20,14 +20,14 @@ def render(demo_mode: bool = False):
 
     # Pick up fuzzy suggestion from previous click (before widget renders)
     _player_default = st.session_state.pop("_bf_fuzzy_pick", "")
+    if _player_default:
+        # Overwrite the widget key directly before it renders
+        st.session_state["bf_player"] = _player_default
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        if _player_default:
-            # Clear widget key so it re-initializes with new default
-            st.session_state.pop("bf_player", None)
         player_name = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama",
-                                    value=_player_default or "", key="bf_player")
+                                    key="bf_player")
     with col2:
         sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="bf_sport")
     with col3:
