@@ -711,6 +711,20 @@ elif page in ("legal_terms", "legal_privacy", "legal_disclosure"):
         st.error(f"{_title} is not available right now.")
 
 
+# --- Admin Stats (hidden: ?admin=stats, only for shh711) ---
+try:
+    if st.query_params.get("admin") == "stats" and current_user == "shh711":
+        from auth import _load_users
+        _admin_users = _load_users()
+        st.sidebar.markdown("---")
+        st.sidebar.markdown(f"**Admin: {len(_admin_users)} registered users**")
+        for _u, _info in sorted(_admin_users.items()):
+            _tier = _info.get("tier", "free")
+            _created = _info.get("created_at", "")[:10]
+            st.sidebar.caption(f"{_u} — {_tier} — {_created}")
+except Exception:
+    pass
+
 # --- Footer ---
 st.sidebar.markdown("---")
 if current_user and not is_pro():
