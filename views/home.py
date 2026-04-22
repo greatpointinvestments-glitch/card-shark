@@ -225,7 +225,10 @@ def render(current_user: str | None):
             f'style="font-size:0.75em;padding:2px 10px;">Buy on eBay</a>'
             f'</div>'
             f'<div style="font-size:0.85em;color:#fbbf24;">BUY or PASS?</div>'
-            f'</div></div>',
+            f'</div>'
+            f'<div style="color:#d1d5db;font-size:0.8em;margin-top:6px;">'
+            f'We pick one card every day. You vote BUY or PASS. We check the price in 7 days. Get it right, build your streak.</div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
         if current_user:

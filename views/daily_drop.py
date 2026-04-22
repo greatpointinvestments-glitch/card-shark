@@ -15,6 +15,15 @@ def render():
     st.title("Daily Drop Challenge")
     st.caption("Every day we pick one card. You vote BUY or PASS. After 7 days, we check the price. Build your streak.")
 
+    with st.expander("How it works"):
+        st.markdown(
+            "1. **We pick one undervalued card every day** using our Flip Finder algorithm\n"
+            "2. **You vote BUY or PASS** — do you think this card goes up in 7 days?\n"
+            "3. **We check the price a week later** and score your call\n"
+            "4. **Correct picks build your streak** — climb the leaderboard and see how you stack up\n\n"
+            "No real money involved. Just test your card market instincts."
+        )
+
     username = st.session_state.get("username")
     today_str = None
 
