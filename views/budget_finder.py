@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from modules.ui_helpers import render_listing_row, deal_score, gradient_divider, tcgplayer_button
+from modules.ui_helpers import render_listing_row, deal_score, gradient_divider, tcgplayer_button, render_fuzzy_suggestions
 from modules.ebay_search import search_ebay_cards, flag_deals
 from modules.pokemon_tcg import search_pokemon_cards, get_pokemon_market_price
 from tiers import check_usage_limit, increment_and_check, render_limit_warning, render_disclaimer
@@ -29,6 +29,13 @@ def render(demo_mode: bool = False):
             if st.button(f"${amt}", key=f"qb_{amt}", use_container_width=True):
                 st.session_state["bf_budget"] = float(amt)
                 st.rerun()
+
+    # Fuzzy search suggestions
+    if player_name:
+        _bf_suggestion = render_fuzzy_suggestions(player_name, sport, key_prefix="bf_fz")
+        if _bf_suggestion:
+            st.session_state["bf_player"] = _bf_suggestion
+            st.rerun()
 
     if not player_name:
         st.info("Type a player name above to get started.")
