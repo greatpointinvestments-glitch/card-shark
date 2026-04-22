@@ -8,6 +8,11 @@ from modules.pokemon_tcg import search_pokemon_cards, get_pokemon_market_price
 from tiers import check_usage_limit, increment_and_check, render_limit_warning, render_disclaimer
 
 
+def _set_budget(amt: float):
+    """Callback for quick-pick budget buttons."""
+    st.session_state["bf_budget"] = amt
+
+
 def render(demo_mode: bool = False):
     st.title("💰 What Can I Get?")
     st.caption("Enter your budget and pick a player — we'll find the best cards you can afford")
@@ -26,9 +31,8 @@ def render(demo_mode: bool = False):
     quick_amounts = [10, 25, 50, 100]
     for i, amt in enumerate(quick_amounts):
         with qb_cols[i]:
-            if st.button(f"${amt}", key=f"qb_{amt}", use_container_width=True):
-                st.session_state["bf_budget"] = float(amt)
-                st.rerun()
+            st.button(f"${amt}", key=f"qb_{amt}", use_container_width=True,
+                      on_click=_set_budget, args=(float(amt),))
 
     # Fuzzy search suggestions
     if player_name:
