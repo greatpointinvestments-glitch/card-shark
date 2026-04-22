@@ -11,7 +11,7 @@ from tiers import can_access, render_upgrade_prompt, render_disclaimer
 
 def render():
     st.title("📈 Market Movers")
-    st.caption("Biggest weekly price gainers and losers across all sports")
+    st.caption("Biggest rookie card price gainers and losers across all sports")
     render_disclaimer(compact=True)
 
     if not can_access("market_movers"):

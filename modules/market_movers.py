@@ -7,9 +7,9 @@ from modules.trade_analyzer import get_card_market_value
 
 @st.cache_data(ttl=600, show_spinner=False)
 def _fetch_market_data(player: str, sport: str) -> dict | None:
-    """Fetch real market data for a player. Returns None on failure."""
+    """Fetch real market data for a player's rookie base card."""
     try:
-        result = get_card_market_value(player, sport, "Any")
+        result = get_card_market_value(player, sport, "Rookie")
         if result and (result.get("avg_sold", 0) > 0 or result.get("avg_active", 0) > 0):
             return result
     except Exception:
