@@ -108,7 +108,9 @@ def render(current_user: str | None):
                         with _ac1:
                             st.write(f"**{listing['title'][:70]}**")
                         with _ac2:
+                            ship = listing.get("shipping", 0)
                             st.write(f"${listing['total']:.2f}")
+                            st.caption(f"+${ship:.2f} ship" if ship > 0 else "Free ship")
                     st.info("Sign up free to see full results, set price alerts, and track your collection.")
                     if st.button("Create Free Account", key="anon_results_signup", type="primary", use_container_width=True):
                         st.session_state.auth_tab = "Sign Up"
@@ -389,6 +391,8 @@ def render(current_user: str | None):
                 vs = deal["vs_median"]
                 color = "#22c55e" if vs < -10 else "#facc15"
                 st.markdown(f"**${deal['total']:.2f}** <span style='color:{color}'>({vs:+.0f}%)</span>", unsafe_allow_html=True)
+                ship = deal.get("shipping", 0)
+                st.caption(f"+${ship:.2f} ship" if ship > 0 else "Free ship")
             with dc3:
                 st.markdown(ebay_button(deal["url"]), unsafe_allow_html=True)
             with dc4:
