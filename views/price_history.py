@@ -5,6 +5,7 @@ import streamlit as st
 from modules.card_types import get_card_type_options
 from modules.price_history import get_price_history, build_price_chart, compute_price_stats
 from modules.affiliates import ebay_search_affiliate_url
+from modules.ui_helpers import render_fuzzy_suggestions
 from tiers import render_disclaimer, is_pro, render_teaser_gate
 
 
@@ -13,6 +14,11 @@ def render():
     st.caption("Interactive charts — track any card's price over time")
     render_disclaimer(compact=True)
 
+    # Pick up fuzzy suggestion before widget renders
+    _fz_pick = st.session_state.pop("_ph_fuzzy_pick", "")
+    if _fz_pick:
+        st.session_state["ph_player"] = _fz_pick
+
     ph_c1, ph_c2, ph_c3 = st.columns(3)
     with ph_c1:
         ph_player = st.text_input("Player Name", placeholder="e.g. Victor Wembanyama", key="ph_player")
@@ -20,6 +26,13 @@ def render():
         ph_sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="ph_sport")
     with ph_c3:
         ph_type = st.selectbox("Card Type", get_card_type_options(), key="ph_type")
+
+    # Fuzzy search suggestions
+    if ph_player:
+        _sug = render_fuzzy_suggestions(ph_player, ph_sport, key_prefix="ph_fz")
+        if _sug:
+            st.session_state["_ph_fuzzy_pick"] = _sug
+            st.rerun()
 
     if ph_player:
         _free_ranges = ["7d", "30d"]

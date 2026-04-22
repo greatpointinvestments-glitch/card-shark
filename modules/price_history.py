@@ -130,8 +130,8 @@ def get_price_history(
         _save_cache(player, sport, card_type, history)
         return history
 
-    # Fall back to demo data if eBay returned nothing useful
-    return generate_demo_price_history(player, sport, card_type, days)
+    # Not enough real data — return empty instead of fake demo data
+    return []
 
 
 def build_price_chart(
