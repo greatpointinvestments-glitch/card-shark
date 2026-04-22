@@ -355,14 +355,14 @@ def _render_card_row(card: dict, sport: str):
             unsafe_allow_html=True,
         )
     with c3:
-        # Buy button — include card_type for more specific results
+        # Buy button — searches for the player, not the exact virtual card
         if sport == "Pokemon":
             url = tcgplayer_search_affiliate_url(card["player_name"])
         else:
-            url = ebay_search_affiliate_url(card["player_name"], sport, card["card_type"])
+            url = ebay_search_affiliate_url(card["player_name"], sport)
         st.markdown(
             f'<a href="{url}" target="_blank" class="ebay-btn" '
-            f'style="font-size:0.75em;padding:3px 8px;">Buy</a>',
+            f'style="font-size:0.75em;padding:3px 8px;">Buy Cards Like This</a>',
             unsafe_allow_html=True,
         )
     with c4:
