@@ -57,7 +57,7 @@ def _render_deep_dive(selected: str, breakout_sport: str, breakout_watchlist: li
                 render_table(rows)
 
     with st.spinner("Checking eBay market..."):
-        listings = search_ebay_cards(selected, breakout_sport, "Rookie", limit=20)
+        listings = search_ebay_cards(selected, breakout_sport, "Any", limit=20)
         listings = flag_deals(listings)
 
     if listings:
@@ -65,7 +65,7 @@ def _render_deep_dive(selected: str, breakout_sport: str, breakout_watchlist: li
                   and not (l.get("buying_format") == "Auction" and l.get("bid_count", 0) == 0)]
         if prices:
             demo_tag = " (Sample)" if demo_mode else ""
-            st.markdown(f"**eBay Market{demo_tag}:** {len(listings)} rookie card listings | Median: ${sorted(prices)[len(prices)//2]:.2f}")
+            st.markdown(f"**eBay Market{demo_tag}:** {len(listings)} listings | Median: ${sorted(prices)[len(prices)//2]:.2f}")
 
             deal_count = sum(1 for l in listings if l.get("is_deal"))
             if deal_count:
@@ -76,7 +76,7 @@ def _render_deep_dive(selected: str, breakout_sport: str, breakout_watchlist: li
                 render_listing_compact(listing)
 
         with st.spinner("Fetching sold data..."):
-            sold = search_ebay_sold(selected, breakout_sport, "Rookie", limit=20)
+            sold = search_ebay_sold(selected, breakout_sport, "Any", limit=20)
         if sold:
             summary = get_market_summary(listings, sold)
             demo_tag = " (Sample)" if demo_mode else ""
