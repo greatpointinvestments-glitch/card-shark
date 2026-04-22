@@ -79,7 +79,12 @@ def render(demo_mode: bool = False):
         with cols[0]:
             st.write(f"**#{player['rank']}**")
         with cols[1]:
-            st.write(f"**{player['name']}**")
+            if st.button(player["name"], key=f"bl_{player['name']}_{player['rank']}",
+                         use_container_width=True):
+                st.session_state.prefill_player = player["name"]
+                st.session_state.prefill_sport = breakout_sport
+                st.session_state.nav_target = "🔍 Player Search"
+                st.rerun()
         with cols[2]:
             st.write(player["team"])
         with cols[3]:
