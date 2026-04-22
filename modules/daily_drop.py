@@ -118,13 +118,13 @@ def check_drop_result(drop_date: str) -> dict | None:
     if entry.get("result_price") is not None:
         return entry
 
-    # Check if 7 days have passed
+    # Check if 30 days have passed
     try:
         drop_dt = datetime.strptime(drop_date, "%Y-%m-%d").date()
     except ValueError:
         return None
 
-    if date.today() < drop_dt + timedelta(days=7):
+    if date.today() < drop_dt + timedelta(days=30):
         return None  # not enough time
 
     # Try to get current price for the player

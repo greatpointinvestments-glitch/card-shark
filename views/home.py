@@ -206,7 +206,7 @@ def render(current_user: str | None):
                 st.toast(f"🔔 {ta['player_name']} hit your ${ta['threshold_price']:.2f} {ta['alert_type']} alert!")
 
     # --- Daily Drop Teaser ---
-    from modules.daily_drop import get_daily_card, get_user_vote, cast_vote, get_community_split, compute_user_streak
+    from modules.daily_drop import get_daily_card, get_user_vote, cast_vote, get_community_split, compute_user_streak, get_leaderboard
     drop = get_daily_card()
     if drop:
         drop_date = drop["drop_date"]
@@ -227,7 +227,7 @@ def render(current_user: str | None):
             f'<div style="font-size:0.85em;color:#fbbf24;">BUY or PASS?</div>'
             f'</div>'
             f'<div style="color:#d1d5db;font-size:0.8em;margin-top:6px;">'
-            f'We pick one card every day. You vote BUY or PASS. We check the price in 7 days. Get it right, build your streak.</div>'
+            f'We pick one card every day. You vote BUY or PASS. We check the price in 30 days. Get it right, build your streak.</div>'
             f'</div>',
             unsafe_allow_html=True,
         )
@@ -261,6 +261,20 @@ def render(current_user: str | None):
             if st.button("Vote Now — Sign Up Free", key="home_drop_signup"):
                 st.session_state.auth_tab = "Sign Up"
                 st.rerun()
+
+        # Mini leaderboard
+        _top3 = get_leaderboard(limit=3)
+        if _top3:
+            _medals = {0: "\U0001f947", 1: "\U0001f948", 2: "\U0001f949"}
+            _lb_items = " &bull; ".join(
+                f'{_medals.get(i, "")} {e["username"]} ({e["current_streak"]} streak)'
+                for i, e in enumerate(_top3)
+            )
+            st.markdown(
+                f'<div style="text-align:center;padding:6px;color:#9ca3af;font-size:0.85em;">'
+                f'Top streaks: {_lb_items}</div>',
+                unsafe_allow_html=True,
+            )
 
     gradient_divider()
 

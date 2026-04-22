@@ -13,13 +13,13 @@ from tiers import is_pro, render_upgrade_banner
 
 def render():
     st.title("Daily Drop Challenge")
-    st.caption("Every day we pick one card. You vote BUY or PASS. After 7 days, we check the price. Build your streak.")
+    st.caption("Every day we pick one card. You vote BUY or PASS. After 30 days, we check the price. Build your streak.")
 
     with st.expander("How it works"):
         st.markdown(
             "1. **We pick one undervalued card every day** using our Flip Finder algorithm\n"
-            "2. **You vote BUY or PASS** — do you think this card goes up in 7 days?\n"
-            "3. **We check the price a week later** and score your call\n"
+            "2. **You vote BUY or PASS** — do you think this card goes up in 30 days?\n"
+            "3. **We check the price 30 days later** and score your call\n"
             "4. **Correct picks build your streak** — climb the leaderboard and see how you stack up\n\n"
             "No real money involved. Just test your card market instincts."
         )
@@ -115,9 +115,34 @@ def render():
     else:
         st.warning("No drop available today — check back later!")
 
+    # --- Leaderboard ---
     gradient_divider()
+    st.markdown("### Leaderboard")
+    lb_limit = 10 if not is_pro() else 20
+    leaderboard = get_leaderboard(limit=lb_limit)
+
+    if leaderboard:
+        for i, entry in enumerate(leaderboard):
+            rank = i + 1
+            medal = {1: "\U0001f947 ", 2: "\U0001f948 ", 3: "\U0001f949 "}.get(rank, "")
+            l1, l2, l3, l4 = st.columns([0.5, 2, 1, 1])
+            with l1:
+                st.write(f"{medal}{rank}")
+            with l2:
+                highlight = " (you)" if username and entry["username"] == username else ""
+                st.write(f"**{entry['username']}**{highlight}")
+            with l3:
+                st.write(f"Streak: {entry['current_streak']}")
+            with l4:
+                st.write(f"{entry['accuracy_pct']}% accuracy")
+    else:
+        st.info("No leaderboard data yet. Be the first to vote!")
+
+    if not is_pro():
+        render_upgrade_banner("Daily Drop", "full leaderboard + all-time history")
 
     # --- Recent Drops ---
+    gradient_divider()
     st.markdown("### Recent Drops")
     drops = get_recent_drops(days=7 if not is_pro() else 30)
 
@@ -142,7 +167,7 @@ def render():
                     )
                     st.caption(f"Correct: {drop['correct_vote']}")
                 else:
-                    st.caption("Pending (7 days)")
+                    st.caption("Pending (30 days)")
             with r4:
                 buy_v = drop.get("total_buy_votes", 0)
                 pass_v = drop.get("total_pass_votes", 0)
@@ -151,29 +176,3 @@ def render():
                     st.caption(f"BUY {round(buy_v/total_v*100)}% / PASS {round(pass_v/total_v*100)}%")
     else:
         st.info("No recent drops yet. Come back tomorrow!")
-
-    gradient_divider()
-
-    # --- Leaderboard ---
-    st.markdown("### Leaderboard")
-    lb_limit = 10 if not is_pro() else 20
-    leaderboard = get_leaderboard(limit=lb_limit)
-
-    if leaderboard:
-        for i, entry in enumerate(leaderboard):
-            rank = i + 1
-            medal = {1: "", 2: "", 3: ""}.get(rank, "")
-            l1, l2, l3, l4 = st.columns([0.5, 2, 1, 1])
-            with l1:
-                st.write(f"{medal}{rank}")
-            with l2:
-                st.write(f"**{entry['username']}**")
-            with l3:
-                st.write(f"Streak: {entry['current_streak']}")
-            with l4:
-                st.write(f"{entry['accuracy_pct']}% accuracy")
-    else:
-        st.info("No leaderboard data yet. Be the first to vote!")
-
-    if not is_pro():
-        render_upgrade_banner("Daily Drop", "full leaderboard + all-time history")
