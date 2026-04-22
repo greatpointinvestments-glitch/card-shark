@@ -18,7 +18,7 @@ def render():
         render_upgrade_prompt("Flip Finder", "See which cards are listed below their sold prices — the easiest money in the hobby.")
         st.stop()
 
-    ff_c1, ff_c2, ff_c3, ff_c4 = st.columns([2, 2, 1.5, 1.5])
+    ff_c1, ff_c2, ff_c3 = st.columns([2, 2, 1.5])
     with ff_c1:
         ff_sports = st.multiselect("Sports", ["NBA", "NFL", "MLB", "Pokemon"], default=["NBA", "NFL", "MLB"], key="ff_sports")
     with ff_c2:
@@ -31,18 +31,11 @@ def render():
             key="ff_confidence",
             help="Filters out flips with thin comp data or sketchy sellers.",
         )
-    with ff_c4:
-        ff_hide_chase = st.checkbox(
-            "Hide Chase/Mystery Packs",
-            value=True,
-            key="ff_hide_chase",
-            help="Exclude chase packs, hot packs, mystery boxes, and break spots.",
-        )
     _conf_threshold = {"Low": 40, "Medium": 60, "High": 80}[ff_conf]
 
     if ff_sports:
         with st.spinner("Scanning for flip opportunities..."):
-            flips = find_flip_opportunities(ff_sports, ff_type, min_confidence=_conf_threshold, exclude_chase=ff_hide_chase)
+            flips = find_flip_opportunities(ff_sports, ff_type, min_confidence=_conf_threshold, exclude_chase=True)
 
         if flips:
             st.success(f"Found {len(flips)} flip opportunities (confidence >= {_conf_threshold}).")
