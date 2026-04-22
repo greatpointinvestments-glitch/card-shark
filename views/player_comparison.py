@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from modules.ui_helpers import gradient_divider, signal_badge, market_signal_badge, score_progress_bar
+from modules.ui_helpers import gradient_divider, signal_badge, market_signal_badge, score_progress_bar, render_fuzzy_suggestions
 from modules.player_compare import fetch_player_comparison_data, generate_verdict
 from modules.affiliates import ebay_search_affiliate_url
 from config.settings import SPORTS
@@ -17,6 +17,14 @@ def render():
         render_upgrade_prompt("Player Comparison", "Compare two players side-by-side — stats, card values, and an investment verdict.")
         st.stop()
 
+    # Pick up fuzzy suggestions before widgets render
+    _fz_a = st.session_state.pop("_cmp_fz_a", "")
+    _fz_b = st.session_state.pop("_cmp_fz_b", "")
+    if _fz_a:
+        st.session_state["cmp_a_name"] = _fz_a
+    if _fz_b:
+        st.session_state["cmp_b_name"] = _fz_b
+
     cmp_left, cmp_div, cmp_right = st.columns([5, 0.5, 5])
 
     with cmp_left:
@@ -29,6 +37,21 @@ def render():
         st.markdown("### Player B")
         pb_name = st.text_input("Player Name", placeholder="e.g. Chet Holmgren", key="cmp_b_name")
         pb_sport = st.selectbox("Sport", ["NBA", "NFL", "MLB", "Pokemon"], key="cmp_b_sport")
+
+    # Fuzzy suggestions for both players
+    _needs_rerun = False
+    if pa_name:
+        _sug_a = render_fuzzy_suggestions(pa_name, pa_sport, key_prefix="cmp_fz_a")
+        if _sug_a:
+            st.session_state["_cmp_fz_a"] = _sug_a
+            _needs_rerun = True
+    if pb_name:
+        _sug_b = render_fuzzy_suggestions(pb_name, pb_sport, key_prefix="cmp_fz_b")
+        if _sug_b:
+            st.session_state["_cmp_fz_b"] = _sug_b
+            _needs_rerun = True
+    if _needs_rerun:
+        st.rerun()
 
     if pa_name and pb_name:
         if st.button("Compare", type="primary", use_container_width=True):
