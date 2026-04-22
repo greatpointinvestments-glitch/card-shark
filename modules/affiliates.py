@@ -133,7 +133,9 @@ def _goldin_url(url: str) -> str:
 def _tcgplayer_url(url: str) -> str:
     if not TCGPLAYER_AFFILIATE_ID:
         return url
-    return _append_params(url, {"partner": TCGPLAYER_AFFILIATE_ID, "utm_source": "cardshark", "utm_medium": "affiliate"})
+    # Impact.com tracking link format — redirects through partner.tcgplayer.com
+    encoded = quote_plus(url)
+    return f"https://partner.tcgplayer.com/c/{TCGPLAYER_AFFILIATE_ID}/1780961/21018?u={encoded}"
 
 
 def _whatnot_url(url: str) -> str:
