@@ -265,7 +265,6 @@ def _render_sports_results(player_query: str, sport: str, demo_mode: bool):
         "price": "Price: Low to High",
         "-price": "Price: High to Low",
         "newlyListed": "Newest",
-        "endingSoonest": "Auction: Ending Soonest",
     }
     eb_filter1, eb_filter2 = st.columns(2)
     with eb_filter1:
@@ -275,16 +274,6 @@ def _render_sports_results(player_query: str, sport: str, demo_mode: bool):
 
     # --- Smart filter auto-linking ---
     _needs_rerun = False
-
-    # Auction: Ending Soonest → auto-flip to Auction Only
-    if sort_option == "endingSoonest" and st.session_state.get("ebay_buying_format") != "Auction Only":
-        st.session_state["ebay_buying_format"] = "Auction Only"
-        _needs_rerun = True
-
-    # BIN Only → don't leave sort on Auction: Ending Soonest
-    if st.session_state.get("ebay_buying_format") == "BIN Only" and sort_option == "endingSoonest":
-        st.session_state["ebay_sort"] = "price"
-        _needs_rerun = True
 
     # Graded Card Type → auto-flip Condition to Graded Only
     _GRADED_CARD_TYPES = {"PSA 10", "PSA 9.5", "PSA 9", "PSA 8", "BGS 10", "BGS 9.5", "BGS 9", "SGC 10", "SGC 9.5", "CGC 10"}
@@ -308,8 +297,11 @@ def _render_sports_results(player_query: str, sport: str, demo_mode: bool):
     with eb_filter5:
         budget = st.number_input("My Budget ($)", min_value=0.0, value=0.0, step=5.0, key="ebay_budget", help="0 = no limit")
 
+    # Auctions always sort by ending soonest regardless of dropdown
+    _effective_sort = "endingSoonest" if buying_format_filter == "Auction Only" else sort_option
+
     with st.spinner("Searching eBay..."):
-        listings = search_ebay_cards(player_name, sport, card_type_filter, sort=sort_option)
+        listings = search_ebay_cards(player_name, sport, card_type_filter, sort=_effective_sort)
         listings = flag_deals(listings)
 
     _GRADED_RE = re.compile(r"\b(PSA|BGS|SGC|CGC)\b", re.IGNORECASE)
