@@ -43,18 +43,7 @@ NBA_BREAKOUT_WATCHLIST = [
     {"name": "Evan Mobley", "team": "Cleveland Cavaliers", "age": 23, "draft_year": 2021, "draft_pick": 3, "seasons": 4},
     {"name": "Scottie Barnes", "team": "Toronto Raptors", "age": 23, "draft_year": 2021, "draft_pick": 4, "seasons": 4},
     {"name": "Franz Wagner", "team": "Orlando Magic", "age": 23, "draft_year": 2021, "draft_pick": 8, "seasons": 4},
-    # Young Stars (2-7 seasons)
-    {"name": "Anthony Edwards", "team": "Minnesota Timberwolves", "age": 23, "draft_year": 2020, "draft_pick": 1, "seasons": 5},
-    {"name": "LaMelo Ball", "team": "Charlotte Hornets", "age": 24, "draft_year": 2020, "draft_pick": 3, "seasons": 5},
-    {"name": "Tyrese Maxey", "team": "Philadelphia 76ers", "age": 24, "draft_year": 2020, "draft_pick": 21, "seasons": 5},
-    {"name": "Tyrese Haliburton", "team": "Indiana Pacers", "age": 24, "draft_year": 2020, "draft_pick": 12, "seasons": 5},
     {"name": "Jalen Green", "team": "Houston Rockets", "age": 23, "draft_year": 2021, "draft_pick": 2, "seasons": 4},
-    {"name": "Ja Morant", "team": "Memphis Grizzlies", "age": 25, "draft_year": 2019, "draft_pick": 2, "seasons": 5},
-    {"name": "Zion Williamson", "team": "New Orleans Pelicans", "age": 25, "draft_year": 2019, "draft_pick": 1, "seasons": 5},
-    {"name": "Trae Young", "team": "Atlanta Hawks", "age": 26, "draft_year": 2018, "draft_pick": 5, "seasons": 7},
-    {"name": "Luka Doncic", "team": "Los Angeles Lakers", "age": 27, "draft_year": 2018, "draft_pick": 3, "seasons": 7},
-    {"name": "Shai Gilgeous-Alexander", "team": "Oklahoma City Thunder", "age": 26, "draft_year": 2018, "draft_pick": 11, "seasons": 7},
-    {"name": "Lauri Markkanen", "team": "Utah Jazz", "age": 27, "draft_year": 2017, "draft_pick": 7, "seasons": 8},
 ]
 
 
@@ -81,7 +70,6 @@ NFL_BREAKOUT_WATCHLIST = [
     {"name": "Puka Nacua", "team": "Los Angeles Rams", "age": 23, "draft_year": 2023, "draft_pick": 177, "seasons": 2},
     {"name": "Sam LaPorta", "team": "Detroit Lions", "age": 24, "draft_year": 2023, "draft_pick": 34, "seasons": 2},
     # Young Stars (2-4 seasons)
-    {"name": "Joe Burrow", "team": "Cincinnati Bengals", "age": 28, "draft_year": 2020, "draft_pick": 1, "seasons": 5},
     {"name": "Trevor Lawrence", "team": "Jacksonville Jaguars", "age": 25, "draft_year": 2021, "draft_pick": 1, "seasons": 4},
     {"name": "Garrett Wilson", "team": "New York Jets", "age": 24, "draft_year": 2022, "draft_pick": 10, "seasons": 3},
     {"name": "Chris Olave", "team": "New Orleans Saints", "age": 24, "draft_year": 2022, "draft_pick": 11, "seasons": 3},
@@ -103,7 +91,6 @@ NFL_BREAKOUT_WATCHLIST = [
     {"name": "Breece Hall", "team": "New York Jets", "age": 24, "draft_year": 2022, "draft_pick": 36, "seasons": 3},
     {"name": "Aidan Hutchinson", "team": "Detroit Lions", "age": 24, "draft_year": 2022, "draft_pick": 2, "seasons": 3},
     {"name": "Will Anderson Jr", "team": "Houston Texans", "age": 23, "draft_year": 2023, "draft_pick": 3, "seasons": 2},
-    {"name": "Tyreek Hill", "team": "Miami Dolphins", "age": 31, "draft_year": 2016, "draft_pick": 165, "seasons": 9},
     {"name": "Ja'Marr Chase", "team": "Cincinnati Bengals", "age": 25, "draft_year": 2021, "draft_pick": 5, "seasons": 4},
 ]
 
@@ -131,8 +118,6 @@ MLB_BREAKOUT_WATCHLIST = [
     {"name": "Adley Rutschman", "team": "Baltimore Orioles", "age": 26, "draft_year": 2019, "draft_pick": 1, "seasons": 4},
     {"name": "Pete Crow-Armstrong", "team": "Chicago Cubs", "age": 22, "draft_year": 2020, "draft_pick": 19, "seasons": 2},
     {"name": "Marcelo Mayer", "team": "Boston Red Sox", "age": 22, "draft_year": 2021, "draft_pick": 4, "seasons": 1},
-    {"name": "Corey Seager", "team": "Texas Rangers", "age": 31, "draft_year": 2012, "draft_pick": 18, "seasons": 10},
-    {"name": "Luis Robert Jr", "team": "Chicago White Sox", "age": 27, "draft_year": None, "draft_pick": None, "seasons": 5},
     # Young arms
     {"name": "Andrew Painter", "team": "Philadelphia Phillies", "age": 22, "draft_year": 2021, "draft_pick": 13, "seasons": 0},
     {"name": "Gavin Williams", "team": "Cleveland Guardians", "age": 25, "draft_year": 2021, "draft_pick": 23, "seasons": 2},
@@ -145,11 +130,6 @@ MLB_BREAKOUT_WATCHLIST = [
     {"name": "Travis Bazzana", "team": "Cleveland Guardians", "age": 22, "draft_year": 2024, "draft_pick": 1, "seasons": 0},
     {"name": "Charlie Condon", "team": "Colorado Rockies", "age": 22, "draft_year": 2024, "draft_pick": 3, "seasons": 0},
     {"name": "Druw Jones", "team": "Arizona Diamondbacks", "age": 21, "draft_year": 2022, "draft_pick": 2, "seasons": 0},
-    # Young stars — established
-    {"name": "Ronald Acuna Jr", "team": "Atlanta Braves", "age": 27, "draft_year": None, "draft_pick": None, "seasons": 7},
-    {"name": "Juan Soto", "team": "New York Mets", "age": 26, "draft_year": None, "draft_pick": None, "seasons": 7},
-    {"name": "Shohei Ohtani", "team": "Los Angeles Dodgers", "age": 30, "draft_year": None, "draft_pick": None, "seasons": 7},
-    {"name": "Mookie Betts", "team": "Los Angeles Dodgers", "age": 32, "draft_year": 2011, "draft_pick": 172, "seasons": 11},
     {"name": "Yoshinobu Yamamoto", "team": "Los Angeles Dodgers", "age": 26, "draft_year": None, "draft_pick": None, "seasons": 2},
     {"name": "Spencer Strider", "team": "Atlanta Braves", "age": 26, "draft_year": 2020, "draft_pick": 126, "seasons": 3},
     {"name": "Kodai Senga", "team": "New York Mets", "age": 32, "draft_year": None, "draft_pick": None, "seasons": 2},
