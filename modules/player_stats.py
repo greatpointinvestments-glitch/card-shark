@@ -288,48 +288,74 @@ def _mlb_search(query: str) -> list[dict]:
 
 
 def _mlb_season_stats(player_id: int, num_seasons: int) -> list[dict]:
-    """Fetch MLB batting stats from official API."""
-    try:
-        resp = requests.get(
-            f"{_MLB_BASE_URL}/people/{player_id}/stats",
-            params={"stats": "yearByYear", "group": "hitting", "sportId": 1},
-            timeout=10,
-        )
-        resp.raise_for_status()
-    except requests.RequestException:
-        return []
+    """Fetch MLB stats from official API — tries hitting first, then pitching."""
 
-    stats_list = resp.json().get("stats", [])
-    if not stats_list:
-        return []
-
-    splits = stats_list[0].get("splits", [])
-    results = []
-
-    for s in splits[-num_seasons:]:
-        stat = s.get("stat", {})
+    def safe_float(val, default=0.0):
         try:
-            season = int(s.get("season", 0))
+            return float(val)
         except (ValueError, TypeError):
-            continue
+            return default
 
-        def safe_float(val, default=0.0):
+    def _fetch_group(group: str) -> list[dict]:
+        try:
+            resp = requests.get(
+                f"{_MLB_BASE_URL}/people/{player_id}/stats",
+                params={"stats": "yearByYear", "group": group, "sportId": 1},
+                timeout=10,
+            )
+            resp.raise_for_status()
+        except requests.RequestException:
+            return []
+        stats_list = resp.json().get("stats", [])
+        if not stats_list:
+            return []
+        return stats_list[0].get("splits", [])
+
+    # Try hitting first
+    splits = _fetch_group("hitting")
+    if splits:
+        results = []
+        for s in splits[-num_seasons:]:
+            stat = s.get("stat", {})
             try:
-                return float(val)
+                season = int(s.get("season", 0))
             except (ValueError, TypeError):
-                return default
+                continue
+            results.append({
+                "season": season,
+                "avg": safe_float(stat.get("avg"), 0),
+                "hr": int(stat.get("homeRuns", 0)),
+                "rbi": int(stat.get("rbi", 0)),
+                "ops": safe_float(stat.get("ops"), 0),
+                "sb": int(stat.get("stolenBases", 0)),
+                "gp": int(stat.get("gamesPlayed", 0)),
+            })
+        return results
 
-        results.append({
-            "season": season,
-            "avg": safe_float(stat.get("avg"), 0),
-            "hr": int(stat.get("homeRuns", 0)),
-            "rbi": int(stat.get("rbi", 0)),
-            "ops": safe_float(stat.get("ops"), 0),
-            "sb": int(stat.get("stolenBases", 0)),
-            "gp": int(stat.get("gamesPlayed", 0)),
-        })
+    # Fall back to pitching
+    splits = _fetch_group("pitching")
+    if splits:
+        results = []
+        for s in splits[-num_seasons:]:
+            stat = s.get("stat", {})
+            try:
+                season = int(s.get("season", 0))
+            except (ValueError, TypeError):
+                continue
+            results.append({
+                "season": season,
+                "era": safe_float(stat.get("era"), 0),
+                "w": int(stat.get("wins", 0)),
+                "l": int(stat.get("losses", 0)),
+                "so": int(stat.get("strikeOuts", 0)),
+                "whip": safe_float(stat.get("whip"), 0),
+                "ip": safe_float(stat.get("inningsPitched"), 0),
+                "gp": int(stat.get("gamesPlayed", 0)),
+                "_is_pitcher": True,
+            })
+        return results
 
-    return results
+    return []
 
 
 def _format_mlb_player(player: dict) -> dict:

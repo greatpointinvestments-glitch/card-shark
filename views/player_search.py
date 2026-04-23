@@ -236,8 +236,14 @@ def _render_sports_results(player_query: str, sport: str, demo_mode: bool):
         seasons = get_multi_season_stats(player_id, sport, num_seasons=6)
 
     if seasons:
-        stat_keys = SPORTS.get(sport, {}).get("key_stats", [])
-        stat_labels = SPORTS.get(sport, {}).get("stat_labels", {})
+        # Detect pitchers (MLB) — use pitching stat keys/labels
+        is_pitcher = seasons[0].get("_is_pitcher", False) if seasons else False
+        if is_pitcher:
+            stat_keys = ["era", "w", "l", "so", "whip", "ip"]
+            stat_labels = {"era": "ERA", "w": "W", "l": "L", "so": "SO", "whip": "WHIP", "ip": "IP"}
+        else:
+            stat_keys = SPORTS.get(sport, {}).get("key_stats", [])
+            stat_labels = SPORTS.get(sport, {}).get("stat_labels", {})
 
         rows = []
         for s in seasons:
