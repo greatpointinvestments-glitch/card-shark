@@ -327,46 +327,13 @@ def render(current_user: str | None):
             if idx < len(_FEATURE_CARDS):
                 title, css, btn_label, btn_key, nav_target, desc, is_pro_feature = _FEATURE_CARDS[idx]
                 with col:
-                    pro_tag = ' <span class="pro-badge">PRO</span>' if (is_pro_feature and not _user_is_pro) else ""
-                    st.markdown(
-                        f'<div class="feature-card {css}" data-nav-card="true">'
-                        f'<h3>{title}{pro_tag}</h3><p>{desc}</p></div>',
-                        unsafe_allow_html=True,
-                    )
-                    if st.button(btn_label, key=btn_key, use_container_width=True):
+                    # Hidden marker so CSS can apply the right gradient to this button
+                    st.markdown(f'<div class="nav-marker {css}"></div>', unsafe_allow_html=True)
+                    pro_label = " \U0001f512 PRO" if (is_pro_feature and not _user_is_pro) else ""
+                    if st.button(f"{title}{pro_label}", key=btn_key, use_container_width=True):
                         st.session_state.nav_target = nav_target
                         st.rerun()
-
-    # JavaScript: make gradient cards clickable (triggers hidden button below)
-    st.markdown('''
-    <style>
-    .feature-card[data-nav-card] { cursor: pointer; }
-    </style>
-    <script>
-    function attachCardClicks() {
-        document.querySelectorAll('.feature-card[data-nav-card]').forEach(card => {
-            if (card.dataset.bound) return;
-            card.dataset.bound = '1';
-            card.addEventListener('click', () => {
-                const mdWrap = card.closest('[data-testid="stMarkdown"]')
-                             || card.closest('.element-container');
-                if (!mdWrap) return;
-                let next = mdWrap.nextElementSibling;
-                // Walk siblings to find the button container
-                for (let i = 0; i < 3 && next; i++) {
-                    const btn = next.querySelector('button');
-                    if (btn) { btn.click(); return; }
-                    next = next.nextElementSibling;
-                }
-            });
-        });
-    }
-    // Run on load and re-run after Streamlit re-renders
-    attachCardClicks();
-    const obs = new MutationObserver(() => setTimeout(attachCardClicks, 200));
-    obs.observe(document.body, {childList: true, subtree: true});
-    </script>
-    ''', unsafe_allow_html=True)
+                    st.caption(desc)
 
     # --- What Pro Found Today (FOMO for free users) ---
     if current_user and not is_pro():

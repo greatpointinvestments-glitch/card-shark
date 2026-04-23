@@ -240,35 +240,43 @@ st.markdown("""
         font-size: 0.7em; margin-right: 4px; vertical-align: middle;
     }
 
-    /* Homepage feature cards — clickable navigation */
-    .feature-card {
-        border: 1px solid #3b4560; border-radius: 12px;
-        padding: 24px 20px; text-align: center; min-height: 150px;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .feature-card[data-nav-card] { cursor: pointer; }
-    .feature-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-        border-color: rgba(245, 158, 11, 0.4) !important;
-    }
-    .feature-card h3 { margin: 8px 0 4px 0; font-size: 1.2em; }
-    .feature-card p { color: #9ca3af; font-size: 0.9em; }
+    /* Nav card markers — hidden, used only for CSS :has() targeting */
+    .nav-marker { display: none; }
 
-    /* Hide the small buttons below nav cards — cards themselves are clickable */
-    .feature-card[data-nav-card] ~ .stButton,
-    [data-testid="stMarkdown"]:has(.feature-card[data-nav-card]) + [data-testid="stElementToolbar"] + div .stButton,
-    [data-testid="stMarkdown"]:has(.feature-card[data-nav-card]) + div:has(.stButton) {
-        height: 0 !important; overflow: hidden !important;
-        margin: 0 !important; padding: 0 !important;
+    /* Base style for all nav card buttons */
+    [data-testid="stColumn"]:has(.nav-marker) button {
+        min-height: 120px !important;
+        font-size: 1.2em !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        border: 1px solid #3b4560 !important;
+        color: white !important;
+        transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    [data-testid="stColumn"]:has(.nav-marker) button:hover {
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+        border-color: rgba(245,158,11,0.4) !important;
     }
 
-    .feature-card-search { background: linear-gradient(135deg, #064e3b, #065f46); }
-    .feature-card-breakout { background: linear-gradient(135deg, #7c2d12, #9a3412); }
-    .feature-card-legends { background: linear-gradient(135deg, #713f12, #854d0e); }
-    .feature-card-trade { background: linear-gradient(135deg, #1e3a5f, #1e40af); }
-    .feature-card-portfolio { background: linear-gradient(135deg, #4a1d6e, #6b21a8); }
-    .feature-card-grading { background: linear-gradient(135deg, #164e63, #0e7490); }
+    /* Per-card gradient backgrounds */
+    [data-testid="stColumn"]:has(.feature-card-drop) button { background: linear-gradient(135deg, #7c2d12, #dc2626) !important; }
+    [data-testid="stColumn"]:has(.feature-card-packs) button { background: linear-gradient(135deg, #4c1d95, #7c3aed) !important; }
+    [data-testid="stColumn"]:has(.feature-card-search) button { background: linear-gradient(135deg, #064e3b, #065f46) !important; }
+    [data-testid="stColumn"]:has(.feature-card-breakout) button { background: linear-gradient(135deg, #7c2d12, #9a3412) !important; }
+    [data-testid="stColumn"]:has(.feature-card-legends) button { background: linear-gradient(135deg, #713f12, #854d0e) !important; }
+    [data-testid="stColumn"]:has(.feature-card-trade) button { background: linear-gradient(135deg, #1e3a5f, #1e40af) !important; }
+    [data-testid="stColumn"]:has(.feature-card-flip) button { background: linear-gradient(135deg, #065f46, #059669) !important; }
+    [data-testid="stColumn"]:has(.feature-card-compare) button { background: linear-gradient(135deg, #4c1d95, #7c3aed) !important; }
+    [data-testid="stColumn"]:has(.feature-card-portfolio) button { background: linear-gradient(135deg, #4a1d6e, #6b21a8) !important; }
+    [data-testid="stColumn"]:has(.feature-card-battles) button { background: linear-gradient(135deg, #064e3b, #059669) !important; }
+    [data-testid="stColumn"]:has(.feature-card-grading) button { background: linear-gradient(135deg, #164e63, #0e7490) !important; }
+    [data-testid="stColumn"]:has(.feature-card-awards) button { background: linear-gradient(135deg, #854d0e, #ca8a04) !important; }
+    [data-testid="stColumn"]:has(.feature-card-games) button { background: linear-gradient(135deg, #1e3a2f, #065f46) !important; }
+    [data-testid="stColumn"]:has(.feature-card-scanner) button { background: linear-gradient(135deg, #7c2d12, #ea580c) !important; }
+    [data-testid="stColumn"]:has(.feature-card-history) button { background: linear-gradient(135deg, #1e3a5f, #3b82f6) !important; }
+    [data-testid="stColumn"]:has(.feature-card-movers) button { background: linear-gradient(135deg, #064e3b, #10b981) !important; }
+    [data-testid="stColumn"]:has(.feature-card-alerts) button { background: linear-gradient(135deg, #713f12, #d97706) !important; }
 
     /* Grading calculator verdicts */
     .grade-it { color: #fff; background-color: #22c55e; padding: 4px 12px; border-radius: 6px; font-weight: bold; }
