@@ -177,7 +177,7 @@ STRIPE_WEBHOOK_SECRET = _get_secret("STRIPE_WEBHOOK_SECRET")
 
 # --- eBay Partner Network (Affiliate) ---
 EPN_CAMPAIGN_ID = _get_secret("EPN_CAMPAIGN_ID")  # e.g. "5338123456"
-EPN_TRACKING_ID = _get_secret("EPN_TRACKING_ID", "card-shark")  # custom tracking alias
+EPN_TRACKING_ID = _get_secret("EPN_TRACKING_ID", "card-hawk")  # custom tracking alias
 
 # --- Other Affiliate Networks (Impact, ShareASale, direct partners) ---
 PWCC_AFFILIATE_ID = _get_secret("PWCC_AFFILIATE_ID")

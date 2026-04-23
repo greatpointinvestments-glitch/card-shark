@@ -321,9 +321,9 @@ def render_battle_card_html(result: dict) -> str:
             {cats_html}
         </table>
         <div style="text-align:center;margin-top:12px;">
-            <a href="https://card-shark.streamlit.app" target="_blank"
+            <a href="https://cardhawk.streamlit.app" target="_blank"
                style="color:#f59e0b;text-decoration:none;font-size:0.8em;font-weight:bold;">
-               card-shark.streamlit.app</a>
+               cardhawk.streamlit.app</a>
         </div>
     </div>
     """

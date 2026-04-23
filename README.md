@@ -1,4 +1,4 @@
-# Card Shark 🦈
+# CardHawk 🦅
 
 **Sports & Pokemon card investment analyzer.** Scan cards with AI, find underpriced deals, track your portfolio, and make smarter trades — powered by live eBay and TCGPlayer market data.
 
@@ -45,8 +45,8 @@
 ## Architecture
 
 ```
-card-shark/              ← Streamlit web app (this repo)
-card-shark-api/          ← FastAPI backend for mobile app (separate repo)
+cardhawk/                ← Streamlit web app (this repo)
+cardhawk-api/            ← FastAPI backend for mobile app (separate repo)
 ```
 
 The FastAPI backend mirrors all business logic for the future React Native mobile app (iOS + Android). Both share the same eBay/TCGPlayer/stats APIs.
@@ -76,8 +76,8 @@ The FastAPI backend mirrors all business logic for the future React Native mobil
 - **Mobile app:** Pending (React Native, post-DUNS approval)
 - **Stripe:** Test mode configured
 - **eBay Partner Network:** Application submitted
-- **Domain:** cardsharkapp.com registered
-- **Email:** hello@cardsharkapp.com (Zoho)
+- **Domain:** cardhawkapp.com registered
+- **Email:** hello@cardhawkapp.com (Zoho)
 
 ## Local Development
 

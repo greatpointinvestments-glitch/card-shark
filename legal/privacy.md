@@ -18,13 +18,13 @@ This policy explains what we collect, why, and what we do with it.
 - Search history and daily usage counters (to enforce free-tier limits)
 
 **Mobile device data (iOS / Android app):**
-- Camera: Card Shark uses your device camera to scan and identify sports cards. Images are sent to our AI service for identification and are not stored unless you add the card to your collection.
-- Photo library: Card Shark accesses your photo library so you can scan cards from saved photos. We only read images you explicitly select.
+- Camera: CardHawk uses your device camera to scan and identify sports cards. Images are sent to our AI service for identification and are not stored unless you add the card to your collection.
+- Photo library: CardHawk accesses your photo library so you can scan cards from saved photos. We only read images you explicitly select.
 - Push notifications: We send push notifications for price alerts you set and trial/subscription reminders. You can disable notifications at any time in your device settings or in-app preferences.
 - Device tokens: We store a Firebase Cloud Messaging token to deliver push notifications. Tokens are deleted when you log out or disable notifications.
 
 **App Tracking Transparency (iOS):**
-- Card Shark does **not** track you across other apps or websites. We do not use Apple's advertising identifier (IDFA). If iOS shows a tracking prompt, we request "Do Not Track" by default.
+- CardHawk does **not** track you across other apps or websites. We do not use Apple's advertising identifier (IDFA). If iOS shows a tracking prompt, we request "Do Not Track" by default.
 
 **Analytics:**
 - Anonymous page-view data via PostHog or Plausible (no personally identifying info beyond user agent + IP)
@@ -55,7 +55,7 @@ We use essential cookies to keep you logged in. Analytics cookies are used only 
 
 ## Affiliate Links
 
-When you click through to eBay, TCGPlayer, PWCC, COMC, or other marketplaces from Card Shark, those sites set their own cookies per their own privacy policies. We only know that a click occurred and if you completed a purchase (for commission purposes). We don't receive your shopping cart or personal info from those sites.
+When you click through to eBay, TCGPlayer, PWCC, COMC, or other marketplaces from CardHawk, those sites set their own cookies per their own privacy policies. We only know that a click occurred and if you completed a purchase (for commission purposes). We don't receive your shopping cart or personal info from those sites.
 
 ## Third Parties We Use
 
@@ -75,9 +75,9 @@ Each has their own privacy policy. We chose them for privacy posture.
 You can at any time:
 - Log in and see / export your portfolio
 - Delete your account (which deletes your stored data within 30 days)
-- Email hello@cardsharkapp.com to request a copy of your data or ask questions
+- Email hello@cardhawkapp.com to request a copy of your data or ask questions
 
-**EU / UK / California residents:** you have additional rights under GDPR / CCPA (access, deletion, portability, non-discrimination). Email hello@cardsharkapp.com to exercise them.
+**EU / UK / California residents:** you have additional rights under GDPR / CCPA (access, deletion, portability, non-discrimination). Email hello@cardhawkapp.com to exercise them.
 
 ## Data Retention
 
@@ -87,7 +87,7 @@ You can at any time:
 
 ## Children
 
-Card Shark is not intended for anyone under 18. We do not knowingly collect data from children. If we learn we have, we delete it.
+CardHawk is not intended for anyone under 18. We do not knowingly collect data from children. If we learn we have, we delete it.
 
 ## Security
 
@@ -104,4 +104,4 @@ We'll post any changes here and email subscribers if changes are material.
 
 ## Contact
 
-hello@cardsharkapp.com
+hello@cardhawkapp.com

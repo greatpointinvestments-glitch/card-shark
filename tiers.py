@@ -86,7 +86,7 @@ def render_disclaimer(compact: bool = False):
         )
         return
     st.info(
-        "**Heads up:** Card Shark is a research tool, not financial advice. "
+        "**Heads up:** CardHawk is a research tool, not financial advice. "
         "Past sold prices don't guarantee future value. Always verify condition, "
         "seller reputation, and return policy before buying. You are responsible "
         "for your own purchases."

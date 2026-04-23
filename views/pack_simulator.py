@@ -145,7 +145,7 @@ def render():
 
     with hof_tab:
         st.markdown("### Pack Hall of Fame")
-        st.caption("The best rippers across all of Card Shark")
+        st.caption("The best rippers across all of CardHawk")
         hof = get_rip_hall_of_fame()
 
         medal_cols = st.columns(3)

@@ -1,4 +1,4 @@
-"""Authentication & user management for Card Shark."""
+"""Authentication & user management for CardHawk."""
 
 import json
 import os

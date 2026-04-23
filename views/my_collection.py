@@ -635,7 +635,7 @@ def render(current_user: str | None):
         st.download_button(
             label="Download Portfolio CSV",
             data=csv_data,
-            file_name="card_shark_portfolio.csv",
+            file_name="cardhawk_portfolio.csv",
             mime="text/csv",
             use_container_width=True,
         )

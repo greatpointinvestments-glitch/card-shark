@@ -1,4 +1,4 @@
-# Card Shark — Go-to-Market Plan
+# CardHawk — Go-to-Market Plan
 
 **Version:** 1.0 (April 2026)
 **Audience:** Sports card collectors, flippers, breakers, and LCS (local card shop) owners
@@ -9,15 +9,15 @@
 ## 1. Pre-Launch Checklist (Do Before Promoting)
 
 - [x] Deploy to Streamlit Community Cloud
-- [x] Register domain: `cardsharkapp.com`
+- [x] Register domain: `cardhawkapp.com`
 - [x] Sign up for eBay Partner Network (application submitted Apr 20, awaiting Campaign ID)
 - [x] Create Stripe Prices — monthly ($7.99), yearly ($59.99), lifetime ($149), plus 20%-off variants ($6.39/mo, $47.99/yr). Test mode configured.
-- [x] Set up hello@cardsharkapp.com (Zoho Mail, active Apr 14)
-- [x] GitHub repos: card-shark (Streamlit) + card-shark-api (FastAPI)
+- [x] Set up hello@cardhawkapp.com (Zoho Mail, active Apr 14)
+- [x] GitHub repos: cardhawk (Streamlit) + cardhawk-api (FastAPI)
 - [x] Pokemon card support added (Pokemon TCG API + TCGPlayer affiliate links)
 - [ ] Add Plausible or PostHog for analytics (free tier fine to start)
 - [ ] Write landing-page meta tags + OG image for link previews
-- [ ] Create X (Twitter), TikTok, Instagram handles: @cardsharkapp
+- [ ] Create X (Twitter), TikTok, Instagram handles: @cardhawkapp
 - [ ] Open a Discord server — two public channels (#general, #flips-of-the-day), one Pro-only channel (#flip-alerts)
 - [ ] Record 10 short demo clips in one sitting (see TikTok calendar below)
 - [ ] Switch Stripe to live mode + set up webhook endpoint
@@ -102,7 +102,7 @@ Look at signups by channel. Whatever worked, pour 3x more effort into it the fol
 7. **"5 cards that are about to moon (or I'm wrong and you should laugh at me)"** — accountability + engagement bait
 8. **"Dealer tried to sell me this for $400. Here's what the comps said."** — confrontation format, high retention
 9. **Duet responses to big card-TikTok accounts** — easy free reach
-10. **Week in the life of a card flipper using Card Shark** — day-in-the-life format
+10. **Week in the life of a card flipper using CardHawk** — day-in-the-life format
 
 ### Hook Templates (Use These First 3 Seconds)
 - "Most collectors don't know this one trick..."
@@ -113,8 +113,8 @@ Look at signups by channel. Whatever worked, pour 3x more effort into it the fol
 
 ### CTA Placement
 - Never hard-sell in video
-- Comment pinned: "Free card scanner at cardsharkapp.com — link in bio"
-- Bio: "Scan any card → instant value → cardsharkapp.com"
+- Comment pinned: "Free card scanner at cardhawkapp.com — link in bio"
+- Bio: "Scan any card → instant value → cardhawkapp.com"
 
 ---
 
@@ -122,7 +122,7 @@ Look at signups by channel. Whatever worked, pour 3x more effort into it the fol
 
 **Problem:** People won't create an account until they trust you. So give them value for free, then capture.
 
-**Build:** A public page at `cardsharkapp.com/grade` — no login. User uploads a card photo, gets back:
+**Build:** A public page at `cardhawkapp.com/grade` — no login. User uploads a card photo, gets back:
 - Estimated raw value
 - Estimated PSA 10 value
 - "Worth grading?" yes/no with math
@@ -134,7 +134,7 @@ Look at signups by channel. Whatever worked, pour 3x more effort into it the fol
 2. Email gate → full PSA EV breakdown
 3. 3-email drip over 2 weeks:
    - Email 1 (day 0): Your report + "here's what most people miss about grading"
-   - Email 2 (day 3): "5 flips I found this week using Card Shark Pro" (social proof)
+   - Email 2 (day 3): "5 flips I found this week using CardHawk Pro" (social proof)
    - Email 3 (day 7): "Try Pro free for 7 days — no card required"
 
 **Expected conversion:** 2-5% of leads → trial → paid.
@@ -152,10 +152,10 @@ Look at signups by channel. Whatever worked, pour 3x more effort into it the fol
 4. Sam should post under his real account, not a burner
 
 ### Types of Helpful Posts
-- Weekly "Market Movers" recap with data from Card Shark (cite the tool once)
-- "How I flipped $X this month using [manual method]" — then in comments: "I used Card Shark to speed up Step 3"
+- Weekly "Market Movers" recap with data from CardHawk (cite the tool once)
+- "How I flipped $X this month using [manual method]" — then in comments: "I used CardHawk to speed up Step 3"
 - Help threads: "How do I know if this is a good price?" → answer with actual comp data
-- AMA after 6 months: "I built Card Shark. Ask me anything."
+- AMA after 6 months: "I built CardHawk. Ask me anything."
 
 ---
 
@@ -191,8 +191,8 @@ Every 3 months, repeat the free-Pro seeding list. Not the same people — new on
 **The National** (July, Chicago) — set up free card scanner demos at a shared booth. Collect emails in exchange for a 1-year Pro trial.
 
 **Regional shows** (Atlanta, Nashville, Charlotte — Sam's territory):
-- Print 500 Card Shark business cards
-- Back of card: QR code → `cardsharkapp.com/show` → free 1-year Pro for attendees
+- Print 500 CardHawk business cards
+- Back of card: QR code → `cardhawkapp.com/show` → free 1-year Pro for attendees
 - Set up at a dealer's booth (barter: free lifetime Pro for them in exchange for table space)
 
 **Goal per show:** 100 signups, 15 trial-to-paid conversions. Paid conversions = break-even on travel inside 6 months.

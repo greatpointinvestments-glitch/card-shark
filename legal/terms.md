@@ -2,15 +2,15 @@
 
 **Last updated: April 22, 2026**
 
-Welcome to Card Shark ("we", "us", "our"). By using cardsharkapp.com or any of our services, you agree to these Terms.
+Welcome to CardHawk ("we", "us", "our"). By using cardhawkapp.com or any of our services, you agree to these Terms.
 
-## 1. What Card Shark Does
+## 1. What CardHawk Does
 
-Card Shark is a sports card research tool. We surface pricing data, sold comps, arbitrage opportunities, and grading estimates sourced from public marketplaces. We are **not** a marketplace, broker, appraiser, or financial advisor.
+CardHawk is a sports card research tool. We surface pricing data, sold comps, arbitrage opportunities, and grading estimates sourced from public marketplaces. We are **not** a marketplace, broker, appraiser, or financial advisor.
 
 ## 2. Not Financial or Investment Advice
 
-Everything shown in Card Shark — flip opportunities, market movers, price predictions, grading recommendations, portfolio valuations — is for **informational purposes only**. Past sold prices do not guarantee future prices. Sports cards are a speculative asset and you can lose money.
+Everything shown in CardHawk — flip opportunities, market movers, price predictions, grading recommendations, portfolio valuations — is for **informational purposes only**. Past sold prices do not guarantee future prices. Sports cards are a speculative asset and you can lose money.
 
 You are solely responsible for your buying and selling decisions. We make no guarantees and disclaim all liability for any loss you incur.
 
@@ -42,13 +42,13 @@ You may not:
 
 ## 7. Third-Party Links and Affiliate Relationships
 
-Card Shark contains affiliate links to eBay, TCGPlayer, PWCC, COMC, Fanatics Collect, Alt, Goldin, and other marketplaces. We may earn a commission when you buy through these links. This does not affect the data we show or our recommendations. See our [Affiliate Disclosure](/disclosure) for details.
+CardHawk contains affiliate links to eBay, TCGPlayer, PWCC, COMC, Fanatics Collect, Alt, Goldin, and other marketplaces. We may earn a commission when you buy through these links. This does not affect the data we show or our recommendations. See our [Affiliate Disclosure](/disclosure) for details.
 
 We are not responsible for the content, condition, or authenticity of cards sold on third-party marketplaces.
 
 ## 8. Award Odds and Sports Data
 
-Card Shark displays publicly available award odds (MVP, Rookie of the Year, Cy Young, etc.) sourced from third-party providers for **informational purposes only**. Card Shark is **not** a sportsbook and does not facilitate, encourage, or enable wagering of any kind.
+CardHawk displays publicly available award odds (MVP, Rookie of the Year, Cy Young, etc.) sourced from third-party providers for **informational purposes only**. CardHawk is **not** a sportsbook and does not facilitate, encourage, or enable wagering of any kind.
 
 - We do not accept bets, wagers, or deposits.
 - We do not partner with or operate as a licensed sportsbook.
@@ -56,7 +56,7 @@ Card Shark displays publicly available award odds (MVP, Rookie of the Year, Cy Y
 - Odds data may be delayed, inaccurate, or unavailable at any time.
 - We make no representation that odds reflect actual betting lines or probabilities.
 
-If you choose to place wagers based on information you see on Card Shark, you do so entirely at your own risk and through third-party platforms that are not affiliated with or endorsed by Card Shark.
+If you choose to place wagers based on information you see on CardHawk, you do so entirely at your own risk and through third-party platforms that are not affiliated with or endorsed by CardHawk.
 
 ## 9. Data Sources
 
@@ -64,7 +64,7 @@ We aggregate data from public APIs (eBay Browse API, eBay Finding API, Pokemon T
 
 ## 10. Limitation of Liability
 
-To the maximum extent allowed by law, Card Shark LLC and its members, managers, officers, employees, and agents are not liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service, including but not limited to losses from buying, selling, or holding sports cards or collectibles based on information provided by the service. Our total aggregate liability is capped at the amount you paid us in the 12 months preceding the claim.
+To the maximum extent allowed by law, CardHawk LLC and its members, managers, officers, employees, and agents are not liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of the service, including but not limited to losses from buying, selling, or holding sports cards or collectibles based on information provided by the service. Our total aggregate liability is capped at the amount you paid us in the 12 months preceding the claim.
 
 ## 11. Dispute Resolution
 
@@ -86,4 +86,4 @@ These Terms are governed by the laws of the State of Delaware, without regard to
 
 ## 15. Contact
 
-hello@cardsharkapp.com
+hello@cardhawkapp.com

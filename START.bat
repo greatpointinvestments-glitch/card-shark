@@ -1,8 +1,8 @@
 @echo off
-title Card Shark
+title CardHawk
 echo.
 echo  =============================
-echo    Card Shark is starting...
+echo    CardHawk is starting...
 echo  =============================
 echo.
 cd /d "%~dp0"

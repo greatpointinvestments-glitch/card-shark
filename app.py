@@ -1,4 +1,4 @@
-"""Card Shark — Sports Card Investment Analyzer.
+"""CardHawk — Sports Card Investment Analyzer.
 
 Thin router: CSS + sidebar nav + page dispatch. All page logic lives in pages/*.py.
 """
@@ -23,8 +23,8 @@ from views import (
 
 # --- Page Config ---
 st.set_page_config(
-    page_title="Card Shark",
-    page_icon="assets/card-shark-logo.png",
+    page_title="CardHawk",
+    page_icon="assets/cardhawk-logo.png",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -534,8 +534,8 @@ st.markdown("""
 
 
 # --- Sidebar Navigation ---
-st.sidebar.image("assets/card-shark-logo.png", width=80)
-st.sidebar.title("Card Shark")
+st.sidebar.image("assets/cardhawk-logo.png", width=80)
+st.sidebar.title("CardHawk")
 st.sidebar.caption("Your Edge in the Hobby")
 
 # --- Auth ---
@@ -556,7 +556,7 @@ try:
 except AttributeError:
     pass  # query_params not available on older Streamlit versions
 except Exception as e:
-    st.error(f"Payment verification failed. If you were charged, email hello@cardsharkapp.com with your receipt. Error: {e}")
+    st.error(f"Payment verification failed. If you were charged, email hello@cardhawkapp.com with your receipt. Error: {e}")
 
 # Nav items grouped: Discover → Tools → Market → My Stuff
 _NAV_ITEMS = [
@@ -746,5 +746,5 @@ with _lf3:
     if st.button("FTC", key="footer_disclosure", use_container_width=True):
         st.session_state.nav_target = "legal_disclosure"
         st.rerun()
-st.sidebar.caption("Card Shark earns affiliate commissions on some links. Not financial advice.")
-st.sidebar.caption("Card Shark v8.0")
+st.sidebar.caption("CardHawk earns affiliate commissions on some links. Not financial advice.")
+st.sidebar.caption("CardHawk v8.0")

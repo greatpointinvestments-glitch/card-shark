@@ -24,13 +24,13 @@ def render(current_user: str | None):
     # --- Landing Hero (for visitors) ---
     if not current_user:
         import base64, os
-        _logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "card-shark-logo.png")
+        _logo_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "cardhawk-logo.png")
         with open(_logo_path, "rb") as _f:
             _logo_b64 = base64.b64encode(_f.read()).decode()
         st.markdown(f"""
         <div style="text-align:center; padding: 40px 20px 10px 20px;">
             <img src="data:image/png;base64,{_logo_b64}" style="width:120px;height:120px;margin-bottom:8px;" />
-            <h1 style="font-size:3em; margin-bottom:0;">Card Shark</h1>
+            <h1 style="font-size:3em; margin-bottom:0;">CardHawk</h1>
             <p style="font-size:1.4em; color:#9ca3af; margin-top:8px;">
                 Scan any card. Know what it's worth. Find the deals everyone else misses.
             </p>
@@ -120,8 +120,8 @@ def render(current_user: str | None):
 
         gradient_divider()
     else:
-        st.image("assets/card-shark-logo.png", width=80)
-        st.title("Card Shark")
+        st.image("assets/cardhawk-logo.png", width=80)
+        st.title("CardHawk")
         st.markdown("#### Find steals. Spot breakouts. Trade smarter.")
 
         # --- Collection Summary Card (logged-in users) ---
@@ -186,7 +186,7 @@ def render(current_user: str | None):
                     st.markdown(
                         '<div style="background:linear-gradient(135deg,#064e3b,#065f46);'
                         'border-radius:10px;padding:16px 20px;margin:10px 0;">'
-                        '<strong style="font-size:1.1em;">Welcome to Card Shark!</strong>'
+                        '<strong style="font-size:1.1em;">Welcome to CardHawk!</strong>'
                         '<p style="color:#d1d5db;margin:8px 0 4px 0;">Get started in 3 steps:</p>'
                         '<ol style="color:#d1d5db;margin:0;padding-left:20px;">'
                         '<li>Search a player to see their card market</li>'

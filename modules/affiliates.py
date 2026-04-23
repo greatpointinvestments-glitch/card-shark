@@ -96,38 +96,38 @@ def _ebay_url(url: str) -> str:
         "mkrid": "711-53200-19255-0",
         "campid": EPN_CAMPAIGN_ID,
         "toolid": 10001,
-        "customid": EPN_TRACKING_ID or "card-shark",
+        "customid": EPN_TRACKING_ID or "card-hawk",
     })
 
 
 def _pwcc_url(url: str) -> str:
     if not PWCC_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": PWCC_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": PWCC_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _comc_url(url: str) -> str:
     if not COMC_AFFILIATE_ID:
         return url
-    return _append_params(url, {"aid": COMC_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"aid": COMC_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _fanatics_url(url: str) -> str:
     if not FANATICS_COLLECT_AFFILIATE_ID:
         return url
-    return _append_params(url, {"aff": FANATICS_COLLECT_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"aff": FANATICS_COLLECT_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _alt_url(url: str) -> str:
     if not ALT_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": ALT_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": ALT_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _goldin_url(url: str) -> str:
     if not GOLDIN_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": GOLDIN_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": GOLDIN_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _tcgplayer_url(url: str) -> str:
@@ -141,43 +141,43 @@ def _tcgplayer_url(url: str) -> str:
 def _whatnot_url(url: str) -> str:
     if not WHATNOT_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": WHATNOT_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": WHATNOT_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _topps_url(url: str) -> str:
     if not TOPPS_AFFILIATE_ID:
         return url
-    return _append_params(url, {"aff": TOPPS_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"aff": TOPPS_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _beckett_url(url: str) -> str:
     if not BECKETT_AFFILIATE_ID:
         return url
-    return _append_params(url, {"aid": BECKETT_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"aid": BECKETT_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _bcw_url(url: str) -> str:
     if not BCW_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": BCW_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": BCW_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _zion_url(url: str) -> str:
     if not ZION_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": ZION_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": ZION_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _cardshellz_url(url: str) -> str:
     if not CARDSHELLZ_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": CARDSHELLZ_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": CARDSHELLZ_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 def _drip_shop_url(url: str) -> str:
     if not DRIP_SHOP_AFFILIATE_ID:
         return url
-    return _append_params(url, {"ref": DRIP_SHOP_AFFILIATE_ID, "utm_source": "cardshark"})
+    return _append_params(url, {"ref": DRIP_SHOP_AFFILIATE_ID, "utm_source": "cardhawk"})
 
 
 _ROUTER = {

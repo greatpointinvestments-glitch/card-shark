@@ -102,8 +102,8 @@ def create_checkout_url(plan: str, username: str, use_discount: bool = False) ->
         return None
 
     try:
-        # Determine base URL for success/cancel (fall back to cardsharkapp.com in prod)
-        base_url = st.session_state.get("_base_url", "https://cardsharkapp.com")
+        # Determine base URL for success/cancel (fall back to cardhawkapp.com in prod)
+        base_url = st.session_state.get("_base_url", "https://cardhawkapp.com")
         session = stripe.checkout.Session.create(
             mode=mode,
             line_items=[{"price": price_id, "quantity": 1}],
@@ -167,7 +167,7 @@ def handle_stripe_return(query_params: dict) -> None:
 
     ok, msg, data = verify_and_activate_subscription(session_id)
     if not ok or not data:
-        st.error(f"Couldn't confirm your payment: {msg}. If you were charged, email hello@cardsharkapp.com with your receipt.")
+        st.error(f"Couldn't confirm your payment: {msg}. If you were charged, email hello@cardhawkapp.com with your receipt.")
         return
 
     # Sanity: ensure session user matches who's logged in
@@ -187,7 +187,7 @@ def handle_stripe_return(query_params: dict) -> None:
     user_info = get_user_info(data["username"])
     st.session_state.user_tier = effective_tier(user_info)
 
-    st.success(f"Welcome to Pro! Your {data['plan']} plan is active. Thanks for supporting Card Shark.")
+    st.success(f"Welcome to Pro! Your {data['plan']} plan is active. Thanks for supporting CardHawk.")
     st.balloons()
 
 
