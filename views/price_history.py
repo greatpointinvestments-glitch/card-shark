@@ -27,6 +27,13 @@ def render():
     with ph_c3:
         ph_type = st.selectbox("Card Type", get_card_type_options(), key="ph_type")
 
+    # Optional filters to narrow to a specific card
+    ph_f1, ph_f2 = st.columns(2)
+    with ph_f1:
+        ph_year = st.text_input("Year (optional)", placeholder="e.g. 2023-24", key="ph_year")
+    with ph_f2:
+        ph_set = st.text_input("Set / Parallel (optional)", placeholder="e.g. Prizm Silver", key="ph_set")
+
     # Fuzzy search suggestions — if suggestions appear, don't run the search yet
     _has_suggestions = False
     if ph_player:
@@ -52,7 +59,10 @@ def render():
             _gated = ph_range in _pro_ranges
 
         with st.spinner("Loading price history..."):
-            history = get_price_history(ph_player, ph_sport, ph_type)
+            history = get_price_history(
+                ph_player, ph_sport, ph_type,
+                year=ph_year.strip(), set_name=ph_set.strip(),
+            )
 
         if history:
             if _gated:

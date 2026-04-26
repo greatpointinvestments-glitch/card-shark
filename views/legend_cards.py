@@ -9,6 +9,7 @@ from modules.ui_helpers import (
 )
 from modules.legends import build_legends_table, get_hidden_gems
 from modules.ebay_search import search_ebay_cards, search_ebay_sold, flag_deals, get_market_summary
+from modules.affiliates import ebay_search_affiliate_url
 from modules.card_types import get_card_type_options
 from data.watchlists import LEGENDS_WATCHLIST
 
@@ -66,6 +67,17 @@ def _render_legend_deep_dive(legend: dict, source: dict, demo_mode: bool = False
         sorted_listings = sorted(filtered_list, key=lambda l: l.get("vs_median", 0))
         for listing in sorted_listings[:10]:
             render_listing_compact(listing)
+
+        # Shop on eBay button — pre-filtered by player + budget
+        shop_url = ebay_search_affiliate_url(legend["name"], source["sport"], card_type)
+        if leg_budget > 0:
+            shop_url += f"&_udhi={leg_budget:.0f}"
+        st.markdown(
+            f'<a href="{shop_url}" target="_blank" class="ebay-btn" '
+            f'style="display:inline-block;margin-top:10px;padding:8px 20px;">'
+            f'Shop on eBay{" (under $" + f"{leg_budget:.0f})" if leg_budget > 0 else ""}</a>',
+            unsafe_allow_html=True,
+        )
 
         with st.spinner("Fetching sold data..."):
             sold = search_ebay_sold(legend["name"], source["sport"], card_type, limit=30)

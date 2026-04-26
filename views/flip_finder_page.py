@@ -63,6 +63,18 @@ def render():
                 with fc5:
                     st.markdown(ebay_button(flip["url"]), unsafe_allow_html=True)
 
+                # Show the comps behind the deal
+                comp_details = flip.get("comp_details", [])
+                if comp_details:
+                    with st.expander(f"View Comps ({len(comp_details)} recent sales)"):
+                        for comp in comp_details:
+                            comp_date = comp.get("sold_date", "N/A")
+                            comp_price = comp.get("sold_price", 0)
+                            comp_title = comp.get("title", "Unknown")[:80]
+                            st.markdown(
+                                f"**${comp_price:.2f}** — {comp_date} — {comp_title}",
+                            )
+
             st.markdown("---")
             st.caption(
                 "**Before you buy:** verify the listing photos match the title, check the return policy, "

@@ -157,6 +157,17 @@ def find_flip_opportunities(
                 if score < min_confidence:
                     continue
 
+                # Keep top 5 comps (most recent first) for user transparency
+                top_comps = sorted(matched, key=lambda m: m.get("sold_date", ""), reverse=True)[:5]
+                comp_details = [
+                    {
+                        "title": c.get("title", ""),
+                        "sold_price": round(c.get("total", 0), 2),
+                        "sold_date": c.get("sold_date", ""),
+                    }
+                    for c in top_comps
+                ]
+
                 flips.append({
                     "player": player_name,
                     "sport": sport,
@@ -169,6 +180,7 @@ def find_flip_opportunities(
                     "url": listing["url"],
                     "image_url": listing.get("image_url", ""),
                     "matched_comps": len(matched_prices),
+                    "comp_details": comp_details,
                     "parallel": extract_parallel(listing["title"]),
                     "is_graded": is_graded(listing["title"]),
                     "grade": extract_grade(listing["title"]),

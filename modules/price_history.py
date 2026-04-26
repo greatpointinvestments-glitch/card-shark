@@ -27,15 +27,15 @@ _CACHE_TTL_HOURS = 24
 _PRICE_HISTORY_IS_DEMO = False  # Now using real data
 
 
-def _cache_key(player: str, sport: str, card_type: str) -> str:
-    raw = f"{player}|{sport}|{card_type}".lower()
+def _cache_key(player: str, sport: str, card_type: str, year: str = "", set_name: str = "") -> str:
+    raw = f"{player}|{sport}|{card_type}|{year}|{set_name}".lower()
     return hashlib.md5(raw.encode()).hexdigest()
 
 
-def _load_cache(player: str, sport: str, card_type: str) -> list[dict] | None:
+def _load_cache(player: str, sport: str, card_type: str, year: str = "", set_name: str = "") -> list[dict] | None:
     """Load cached price history if fresh enough."""
     os.makedirs(_CACHE_DIR, exist_ok=True)
-    path = os.path.join(_CACHE_DIR, f"{_cache_key(player, sport, card_type)}.json")
+    path = os.path.join(_CACHE_DIR, f"{_cache_key(player, sport, card_type, year, set_name)}.json")
     if not os.path.exists(path):
         return None
     try:
@@ -49,10 +49,10 @@ def _load_cache(player: str, sport: str, card_type: str) -> list[dict] | None:
         return None
 
 
-def _save_cache(player: str, sport: str, card_type: str, history: list[dict]) -> None:
+def _save_cache(player: str, sport: str, card_type: str, history: list[dict], year: str = "", set_name: str = "") -> None:
     """Save price history to local cache."""
     os.makedirs(_CACHE_DIR, exist_ok=True)
-    path = os.path.join(_CACHE_DIR, f"{_cache_key(player, sport, card_type)}.json")
+    path = os.path.join(_CACHE_DIR, f"{_cache_key(player, sport, card_type, year, set_name)}.json")
     try:
         with open(path, "w") as f:
             json.dump({
@@ -107,6 +107,8 @@ def get_price_history(
     sport: str = "NBA",
     card_type: str = "Any",
     days: int = 365,
+    year: str = "",
+    set_name: str = "",
 ) -> list[dict]:
     """Get price history for a player/card combo.
 
@@ -118,16 +120,19 @@ def get_price_history(
     5. Fall back to demo data if eBay returns nothing
     """
     # Try cache first
-    cached = _load_cache(player, sport, card_type)
+    cached = _load_cache(player, sport, card_type, year, set_name)
     if cached:
         return cached
 
     # Query eBay sold listings
-    sold = search_ebay_sold(player, sport, card_type, limit=100)
+    sold = search_ebay_sold(
+        player, sport, card_type, limit=100,
+        year=year or None, set_name=set_name or None,
+    )
     history = _sold_to_daily_prices(sold)
 
     if history and len(history) >= 3:
-        _save_cache(player, sport, card_type, history)
+        _save_cache(player, sport, card_type, history, year, set_name)
         return history
 
     # Not enough real data — return empty instead of fake demo data
